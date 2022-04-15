@@ -37,7 +37,7 @@ S: bal_ouv mc_exl mc_docprogram idf bal_fer bal_ouv mc_sub mc_variable bal_fer D
 ;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+ 
 DECLARATION:  bal_ouv DECLARATION_SIMPLE DECLARATION
             | bal_ouv mc_array mc_as TYPE bal_fer DECLARATION_TAB DECLARATION 
             |
