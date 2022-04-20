@@ -1,18 +1,28 @@
 %{
     #include "stdlib.h"
     #include "stdio.h"
-	#include "string.h" 
+	#include "string.h"
 	int nb_ligne=1;
 	int Col = 1;
 	extern yytext;
+    char sauvType[10];
+    char sauvValStr[100];
+    float sauvVal;
+    int sauvCateg = 1; 
+    //0 constante 1 var
 %} 
+%union{
+  int entier;
+  char* string; 
+  float reel;
+}
 %token mc_exl mc_docprogram mc_sub mc_variable mc_body bal_ouv bal_fer bal_slch_fer
-%token bal_slch_ouv idf mc_as pvg ou mc_array deuxpt mc_constante egal quote par_ouv par_fer cr_ouv cr_fer
-%token cst_unsigned_int cst_signed_int cst_float cst_bool cst_char 
+%token bal_slch_ouv <string>idf mc_as pvg ou mc_array deuxpt mc_constante egal par_ouv par_fer cr_ouv cr_fer
+%token <entier>cst_unsigned_int <entier>cst_signed_int <reel>cst_float <entier>cst_bool <string>cst_char 
 %token plus moins mult divis and or not
 %token sup inf supeg infeg ega dif
-%token mc_int mc_float mc_char mc_string mc_bool mc_aff vrg mc_input mc_output dollar mod hash arob etcom
-%token chaine_gauche chaine_droite chaine_outdr simple_string
+%token <string>mc_int <string>mc_float <string>mc_char <string>mc_string <string>mc_bool mc_aff vrg mc_input mc_output dollar mod hash arob etcom
+%token <string>chaine_gauche <string>chaine_droite <string>chaine_outdr <string>simple_string
 %token mc_if mc_then mc_else mc_do mc_while mc_for mc_until
 
 %left or
@@ -23,59 +33,73 @@
 %left mult divis
 %start S 
 %%
-S: bal_ouv mc_exl mc_docprogram idf bal_fer bal_ouv mc_sub mc_variable bal_fer DECLARATION bal_slch_ouv mc_sub mc_variable bal_fer bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
-                  {printf("programme syntaxiquement correct");
-                                YYACCEPT;}
-;
-| bal_ouv mc_exl mc_docprogram idf bal_fer bal_ouv mc_sub mc_variable bal_fer DECLARATION bal_slch_ouv mc_sub mc_variable bal_fer DECLARATION_CONST bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
-                  {printf("programme syntaxiquement correct");
-                                YYACCEPT;}
-;
-| bal_ouv mc_exl mc_docprogram idf bal_fer  DECLARATION_CONST bal_ouv mc_sub mc_variable bal_fer DECLARATION bal_slch_ouv mc_sub mc_variable bal_fer bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
+S: bal_ouv mc_exl mc_docprogram idf bal_fer  DEC_TOTAL bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
                   {printf("programme syntaxiquement correct");
                                 YYACCEPT;}
 ;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
- 
+
+DEC_TOTAL: bal_ouv mc_sub mc_variable bal_fer DECLARATION DECLARATION_CONST 
+         | DECLARATION_CONST bal_ouv mc_sub mc_variable bal_fer DECLARATION
+         | bal_ouv mc_sub mc_variable bal_fer DECLARATION
+         | DECLARATION_CONST
+         ;
+
+
+
 DECLARATION:  bal_ouv DECLARATION_SIMPLE DECLARATION
             | bal_ouv mc_array mc_as TYPE bal_fer DECLARATION_TAB DECLARATION 
-            |
+            | bal_slch_ouv mc_sub mc_variable bal_fer { sauvCateg = 0 ;}
             ; 
 
-DECLARATION_CONST: bal_ouv mc_sub mc_constante bal_fer LISTE_DEC_CONST
-                 ;
+DECLARATION_CONST: bal_ouv mc_sub mc_constante bal_fer  { sauvCateg = 0 ; }  LISTE_DEC_CONST ;
                  
   
 LISTE_DEC_CONST: bal_ouv DECLARATION_SIMPLE LISTE_DEC_CONST
-               | bal_ouv idf egal SWITCH_CST_TYPES bal_slch_fer pvg LISTE_DEC_CONST
-               | bal_slch_ouv mc_sub mc_constante bal_fer
+               | bal_ouv DEC_CONST_EGAL LISTE_DEC_CONST 
+               | bal_slch_ouv mc_sub mc_constante bal_fer { sauvCateg = 1;}
                ; 
+DEC_CONST_EGAL: idf egal SWITCH_CST_TYPES  bal_slch_fer pvg {
 
-SWITCH_INT: cst_signed_int
-          | cst_unsigned_int;
+                    printf("START SAUV CATEG %d \n",sauvCateg);
+                     if(sauvCateg== 1) inserer($1,sauvType,NULL,"",0,0,0,0);
+                                        else if(sauvCateg== 0) inserer($1,sauvType,NULL,"",0,0,0,1);
+                    printf("END SAUV CATEG %d \n",sauvCateg);
+
+                     }
+;
+SWITCH_INT: cst_signed_int  {sauvVal=$1; strcpy(sauvType,"INT");}
+          | cst_unsigned_int {sauvVal=$1; strcpy(sauvType,"INT");}
+;
 
 SWITCH_CST_TYPES: SWITCH_INT
-                | cst_float
-                | cst_bool
-                | cst_char
-                | simple_string
+                | cst_float {sauvVal=$1; strcpy(sauvType,"FLT");}
+                | cst_bool  {sauvVal=$1; strcpy(sauvType,"BOL");}
+                | cst_char  {strcpy(sauvValStr,$1); strcpy(sauvType,"CHR");}
+                | simple_string  { strcpy(sauvValStr,$1); strcpy(sauvType,"STR");}
                 ;
-
-DECLARATION_SIMPLE: idf ou DECLARATION_SIMPLE
-                  | idf mc_as TYPE bal_slch_fer pvg
+//////////////////////////////////////////////////////////////
+DECLARATION_SIMPLE: idf ou DECLARATION_SIMPLE  { 
+                                        if(sauvCateg== 1) inserer($1,sauvType,NULL,"",0,0,0,0);
+                                        else if(sauvCateg== 0) inserer($1,sauvType,NULL,"",0,0,0,1);
+                                    }
+                  | idf mc_as TYPE bal_slch_fer pvg { 
+                                        if(sauvCateg== 1) inserer($1,sauvType,NULL,"",0,0,0,0); /// 2 fois 
+                                        else if(sauvCateg== 0) inserer($1,sauvType,NULL,"",0,0,0,1);
+                       }
                     ; 
 
 
 
-TYPE: mc_int
-    | mc_float
-    | mc_char
-    | mc_string
-    | mc_bool
+TYPE: mc_int     {strcpy(sauvType,$1);}  
+    | mc_float   {strcpy(sauvType,$1);}
+    | mc_char    {strcpy(sauvType,$1);}
+    | mc_string  {strcpy(sauvType,$1);}
+    | mc_bool    {strcpy(sauvType,$1);}
     ;
 
-DECLARATION_TAB:  bal_ouv idf deuxpt cst_unsigned_int bal_slch_fer DECLARATION_TAB 
+DECLARATION_TAB:  bal_ouv idf deuxpt cst_unsigned_int bal_slch_fer DECLARATION_TAB { inserer($2,sauvType,NULL,"",$4,0,0,0);}
                 | bal_slch_ouv mc_array bal_fer
                 ;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,17 +128,46 @@ X: EXPRESSION_ARITH
  | cst_bool
 ; 
 /////////////////////////////////////////////////
+
+term: cst_signed_int
+     | cst_float
+     | idf 
+     | idf cr_ouv cst_unsigned_int cr_fer
+     ;
+     
 EXPRESSION_ARITH: EXPRESSION_ARITH plus EXPRESSION_ARITH
                 | EXPRESSION_ARITH moins EXPRESSION_ARITH
-                | EXPRESSION_ARITH mult EXPRESSION_ARITH
                 | EXPRESSION_ARITH divis EXPRESSION_ARITH
-                | cst_signed_int
-                | cst_unsigned_int
-                | cst_float
-                | idf 
-                | idf cr_ouv cst_unsigned_int cr_fer
-                | par_ouv EXPRESSION_ARITH par_fer
+                | EXPRESSION_ARITH mult EXPRESSION_ARITH
+                | plus %prec par_ouv EXPRESSION_ARITH par_fer
+                | moins %prec par_ouv EXPRESSION_ARITH par_fer
+                | divis %prec par_ouv EXPRESSION_ARITH par_fer
+                | mult %prec par_ouv EXPRESSION_ARITH par_fer
+                | term
                 ; 
+
+/* 
+EXPRESSION_ARITH: EXPRESSION_ARITH plus term
+                | EXPRESSION_ARITH moins term
+                | term
+                ;
+term: term mult factor 
+    | term divis factor 
+    | factor
+    ; 
+
+factor: par_ouv EXPRESSION_ARITH par_fer
+      | num 
+      ;
+num:   cst_unsigned_int
+     | cst_float
+     | idf 
+     | idf cr_ouv cst_unsigned_int cr_fer
+     ; */
+
+
+
+
 /////////////////////////////////////////////////
 
 EXPRESSION_LOGIQUE: and par_ouv EXPRESSIONS par_fer 
@@ -216,9 +269,18 @@ INSTRUCTION_BOUCLE_FOR: AFFECTATION INSTRUCTION_BOUCLE_FOR
 /////////////////////////////////////////////////
 %%
 main()
-{ yyparse(); }
+{   
+    initialisation();
+    yyparse(); 
+    affichage();
+    
+}
+    
 yywrap ()
-{}
+{
+
+}
+
 int  yyerror(char *msg){
 
    printf(" erreur syntaxique a la ligne %d a la colonne %d de l'entite lexical %s\n",nb_ligne,Col,yytext);

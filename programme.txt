@@ -1,38 +1,43 @@
 <!docprogram Amina_01>
-
+    
+    
     < SUB VARIABLE >
-        < X AS INT /> ;
-        < T AS FLT /> ;
-        < Y|Z|W AS INT /> ;
+        <S AS FLT /> ;
+        < Z|W AS INT /> ;
         <ARRAY AS INT > 
-            <nom_tableau1: 327678/>  
-            <nom_tableau1: 20/> 
+            <nom_tableau1: 32767/>  
+            <nom_tableau2: 20/> 
         </ARRAY> 
         <ARRAY AS CHR > 
-            <nom_tableau1: 20/>  
-            <nom_tableau1: 20/> 
-        </ARRAY> 
-        < X AS INT /> ;
-        < T AS FLT /> ;
-        < Y|Z|W AS INT /> ;
-
+            <nom_tableau3: 30/>  
+            <nom_tableau4: 20/> 
+        </ARRAY>  
+        <G AS FLT /> ;
+        < T|U AS INT /> ;
+        < Y AS INT /> ;
+        < F  AS INT /> ; 
+         < A AS INT /> ; 
+          < B AS INT /> ; 
          <ARRAY AS STR > 
-            <nom_tableau1: 20/>  
-            <nom_tableau1: 20/> 
+            <nom_tableau5: 20/>  
+            <nom_tableau6: 20/> 
         </ARRAY> 
     </ SUB VARIABLE >
     <SUB CONSTANTE> 
-    
-     <nom_constante2 = 'd' />; 
-     <nom_constante1  AS INT />;
-     <nom_constante3 =(-32.555)/>;  
-     <idf | idf2  AS BOL /> ;  
+        <nom_constante_5 = "hello" />;
+        <nom_constante_1  AS INT />; 
+        <nom_constante_2  AS INT />; 
+        <nom_constante_7 = 'a' />;
+        <nom_constante_8 = (-151.55) />;
+        <idf|idf2 AS BOL /> ; 
+        <nom_constante_6 = 20 />;
+        <const = FALSE />;
     </SUB CONSTANTE>
     
     <body>
 
         <AFF: idf, 'a' />
-        <AFF: a, SUP(a,(x+7+b)/ (5212254.333-(-2)))/>
+        <AFF: a, SUP(a,(x+(a+7+b))/ (5254.333-(-2)))/>
         <INPUT: idf  " & " />
         <AFF: a, 'a' />
         <AFF: T1[3], (x+7+T2[1])/ (555411.3-(+2))/>
