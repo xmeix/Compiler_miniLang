@@ -4,18 +4,12 @@
 	#include <string.h>
 	#include "TS.h"
     #include "syntaxique.tab.h"
+	extern YYSTYPE yylval;
     extern nb_ligne;
 	extern Col;
 	char t[100];
     int i=1; 
 	int k;
-	extern YYSTYPE yylval;
-	/*
-	A REVOIR : 
-	-PRBLM INPUT coté droit quand on enleve l'espace une erreur se prod " @"
-	-MEME PRBLM les deux cotés output "@"
-	
-	*/
 %}
 Signe [!\'-\.\:-\?\[\{-\}]
 MESSAGE ({lettre}|{chiffre}|{Signe}|" "|"-")*
@@ -26,7 +20,8 @@ SimpleString ["]{MESSAGE}["]
 lettre [a-zA-Z]
 chiffre [0-9]
 CST_UNSIGNED_INT [1-9]{chiffre}*|0
-CST_SIGNED_INT \(("+"|"-")([1-9]{chiffre}*)\)|{CST_UNSIGNED_INT}
+CST_INT_POS [+][1-9]{chiffre}*
+CST_INT_NEG [-][1-9]{chiffre}*
 CST_FLOAT \([-+][1-9][0-9]{0,6}\.[0-9]{1,3}\)|\([-+]0\.[0-9]{1,3}\)|([1-9][0-9]{0,6}\.[0-9]{1,3}|0\.[0-9]{1,3})
 CST_BOOL ("TRUE"|"FALSE")
 CST_CHAR ['].?[']
@@ -55,69 +50,70 @@ BOL  {  Col= Col+strlen(yytext); yylval.string=strdup("BOL");  return mc_bool;}
 	}
 		if(atoi(t)>32767){
 			printf(" erreur sémantique a la ligne %d a la colonne %d de l'entite lexical %s\n",nb_ligne,Col,yytext);
-			
+			memset(t, 0, 100);
+			return 0;
 		}else {
 			yylval.entier=atoi(yytext);
-			// printf("cst plus : %d\n",atoi(t));
+			// printf("--------------------------cst plus : %d\n",yylval);
+			memset(t, 0, 100);
 			return cst_unsigned_int; 
 			}
-    return 0;
 	memset(t, 0, 100);
+    return cst_unsigned_int;
+	
 
 }
-{CST_SIGNED_INT} { 
-	
-	Col= Col+strlen(yytext); 
-	k=0;
-	while(i<strlen(yytext)-1)
-	{
-		// printf("%c \t",yytext[i]);
-		t[k]=yytext[i];
-		i++;
-		k++;
-	}
-	// printf(" %s \n",t);
-	
-	// k=0;
-	// while(k<strlen(t)){
-	// 	printf(" %c \n",t[k]);
-	// 	k++;
-	// }
-	
-	if(t[0]=='+'){
-
-		if(atoi(t)>32767){
-			printf(" erreur sémantique a la ligne %d a la colonne %d de l'entite lexical %s\n",nb_ligne,Col,yytext);
-		}else {
-			// printf("cst_plus : %d\n",atoi(t));
-			yylval.entier=atoi(yytext);
-			return cst_signed_int;
-		}
-
-	}else if (t[0]=='-'){
-		
-		if(atoi(t)<-32768){
-			printf(" erreur sémantique a la ligne %d a la colonne %d de l'entite lexical %s\n",nb_ligne,Col,yytext);
-		}else {
-			printf("cst_moins : %d\n",atoi(t));
-			yylval.entier=atoi(yytext);
-			return cst_signed_int;
-		}
-	}
-	memset(t, 0, 100);
-	i=1;
- }
+{CST_INT_POS}  {  
+	Col= Col+strlen(yytext);
+    if(atoi(yytext)>+32767) printf(" erreur semantique a la ligne %d a la colonne %d de l'entite lexical %s\n",nb_ligne,Col,yytext);
+	yylval.entier=atoi(yytext);
+	return cst_int_pos;
+	} 
+{CST_INT_NEG} {  Col= Col+strlen(yytext);
+          if( atoi(yytext)<-32768) printf(" erreur semantique a la ligne %d a la colonne %d de l'entite lexical %s\n",nb_ligne,Col,yytext);
+ 			yylval.entier=atoi(yytext); return cst_int_neg;
+} 
 {CST_FLOAT} { 
 	Col= Col+strlen(yytext); 
-	yylval.reel=atof(yytext);
-	return cst_float; }
+		
+		
+	   if(yytext[0]=='(') {
+		   
+			k=0;
+			i=1;
+			while(i<strlen(yytext)-1)
+			{
+				
+				t[k]=yytext[i];
+				// printf("%c \t",yytext[i]);
+				i++;
+				k++;
+			}
+
+		//    printf("++++++++++++++++++CST FLT PAR TRUE:%s\n",t);
+		yylval.reel=atof(t);
+		memset(t, 0, 100);
+		i=1;
+		k=0;
+		   
+		}
+	   else {
+		   
+			yylval.reel=atof(yytext);
+		//    printf("++++++++++++++++++CST FLT NOT:%s\n",yytext);
+		   
+		   }
+	return cst_float; 
+	
+}
 {CST_BOOL} { 
 	Col= Col+strlen(yytext); 
-	 if(yytext=="TRUE"){
-		yylval.entier = 1;
-	}else if(yytext=="FALSE"){
-		yylval.entier = 0;
-	}
+	//  if(strcmp(yytext,"TRUE")==0){
+	// 	yylval.entier = 1;
+	// }else if(strcmp(yytext,"FALSE")==0){
+	// 	yylval.entier = 0;
+	// }
+		yylval.string=strdup(yytext);
 	return cst_bool; }
 {CST_CHAR} { 
 	Col= Col+strlen(yytext); 
@@ -176,7 +172,7 @@ DIF { Col= Col+strlen(yytext); return dif;}
 "@" { Col= Col+strlen(yytext); return arob; } 
 {SimpleString} { 
 	Col= Col+strlen(yytext); 
-	yylval.string = strdup(yytext);
+		yylval.string = strdup(yytext);
 	return simple_string; 
 	}
 {CHAINEGAUCHE} { 
@@ -198,4 +194,3 @@ DIF { Col= Col+strlen(yytext); return dif;}
 [ \t] 
 \n {Col= 1; nb_ligne++;}
 . { printf("erreur lexical a la ligne %d colonne %d sur l'entite %s \n",nb_ligne,Col,yytext);}
-	

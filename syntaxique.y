@@ -1,30 +1,35 @@
 %{
     #include "stdlib.h"
     #include "stdio.h"
-	#include "string.h"
+	  #include "string.h"
 	int nb_ligne=1;
 	int Col = 1;
 	extern yytext;
-    char sauvType[10];
-    char sauvValStr[100];
-    float sauvVal;
-    int sauvCateg = 1; 
-    //0 constante 1 var
+    char sauvType[20];
+    char sauvVal[100];
+    int sauvCateg = 1;
+    int sauvState;
+    float val;
+    float sauvValeur;
+    
 %} 
 %union{
   int entier;
   char* string; 
   float reel;
 }
+
 %token mc_exl mc_docprogram mc_sub mc_variable mc_body bal_ouv bal_fer bal_slch_fer
 %token bal_slch_ouv <string>idf mc_as pvg ou mc_array deuxpt mc_constante egal par_ouv par_fer cr_ouv cr_fer
-%token <entier>cst_unsigned_int <entier>cst_signed_int <reel>cst_float <entier>cst_bool <string>cst_char 
-%token plus moins mult divis and or not
+%token <entier>cst_unsigned_int <entier>cst_int_pos <entier>cst_int_neg <reel>cst_float <string>cst_bool <string>cst_char 
+%token plus moins mult divis and or not 
 %token sup inf supeg infeg ega dif
 %token <string>mc_int <string>mc_float <string>mc_char <string>mc_string <string>mc_bool mc_aff vrg mc_input mc_output dollar mod hash arob etcom
 %token <string>chaine_gauche <string>chaine_droite <string>chaine_outdr <string>simple_string
 %token mc_if mc_then mc_else mc_do mc_while mc_for mc_until
 
+%type <reel> TERM 
+%type <reel> EXPRESSION_ARITH
 %left or
 %left and 
 %right not
@@ -50,56 +55,47 @@ DEC_TOTAL: bal_ouv mc_sub mc_variable bal_fer DECLARATION DECLARATION_CONST
 
 DECLARATION:  bal_ouv DECLARATION_SIMPLE DECLARATION
             | bal_ouv mc_array mc_as TYPE bal_fer DECLARATION_TAB DECLARATION 
-            | bal_slch_ouv mc_sub mc_variable bal_fer { sauvCateg = 0 ;}
+            | bal_slch_ouv mc_sub mc_variable bal_fer { sauvCateg = 0;}
             ; 
 
-DECLARATION_CONST: bal_ouv mc_sub mc_constante bal_fer  { sauvCateg = 0 ; }  LISTE_DEC_CONST ;
+DECLARATION_CONST: bal_ouv mc_sub mc_constante bal_fer { sauvCateg = 0; } LISTE_DEC_CONST ;
                  
   
 LISTE_DEC_CONST: bal_ouv DECLARATION_SIMPLE LISTE_DEC_CONST
                | bal_ouv DEC_CONST_EGAL LISTE_DEC_CONST 
-               | bal_slch_ouv mc_sub mc_constante bal_fer { sauvCateg = 1;}
+               | bal_slch_ouv mc_sub mc_constante bal_fer  { sauvCateg = 1;} 
                ; 
-DEC_CONST_EGAL: idf egal SWITCH_CST_TYPES  bal_slch_fer pvg {
-
-                    printf("START SAUV CATEG %d \n",sauvCateg);
-                     if(sauvCateg== 1) inserer($1,sauvType,NULL,"",0,0,0,0);
-                                        else if(sauvCateg== 0) inserer($1,sauvType,NULL,"",0,0,0,1);
-                    printf("END SAUV CATEG %d \n",sauvCateg);
-
-                     }
-;
-SWITCH_INT: cst_signed_int  {sauvVal=$1; strcpy(sauvType,"INT");}
-          | cst_unsigned_int {sauvVal=$1; strcpy(sauvType,"INT");}
+DEC_CONST_EGAL: idf egal SWITCH_CST_TYPES bal_slch_fer pvg { verificationInsertion($1,sauvCateg,sauvType,sauvVal,0,sauvState);}
 ;
 
 SWITCH_CST_TYPES: SWITCH_INT
-                | cst_float {sauvVal=$1; strcpy(sauvType,"FLT");}
-                | cst_bool  {sauvVal=$1; strcpy(sauvType,"BOL");}
-                | cst_char  {strcpy(sauvValStr,$1); strcpy(sauvType,"CHR");}
-                | simple_string  { strcpy(sauvValStr,$1); strcpy(sauvType,"STR");}
+                | cst_float {sprintf(sauvVal,"%f",$1); sauvState=1; strcpy(sauvType,"FLT");}
+                | cst_bool {strcpy(sauvVal,$1); sauvState=2; strcpy(sauvType,"BOL");}
+                | cst_char {strcpy(sauvVal,$1);   sauvState=2; strcpy(sauvType,"CHR");}
+                | simple_string {strcpy(sauvVal,$1); sauvState=2; strcpy(sauvType,"STR");}
                 ;
+SWITCH_INT: par_ouv cst_int_pos par_fer {sprintf(sauvVal,"%d",$2); sauvState=0; strcpy(sauvType,"INT");}
+          | par_ouv cst_int_neg par_fer {sprintf(sauvVal,"%d",$2); sauvState=0; strcpy(sauvType,"INT");}
+          | cst_unsigned_int {sprintf(sauvVal,"%d",$1); sauvState=0; strcpy(sauvType,"INT");}
+;
 //////////////////////////////////////////////////////////////
-DECLARATION_SIMPLE: idf ou DECLARATION_SIMPLE  { 
-                                        if(sauvCateg== 1) inserer($1,sauvType,NULL,"",0,0,0,0);
-                                        else if(sauvCateg== 0) inserer($1,sauvType,NULL,"",0,0,0,1);
-                                    }
-                  | idf mc_as TYPE bal_slch_fer pvg { 
-                                        if(sauvCateg== 1) inserer($1,sauvType,NULL,"",0,0,0,0); /// 2 fois 
-                                        else if(sauvCateg== 0) inserer($1,sauvType,NULL,"",0,0,0,1);
-                       }
-                    ; 
+DECLARATION_SIMPLE: idf ou DECLARATION_SIMPLE{
+                    verificationInsertion($1,sauvCateg,sauvType,"",0,3);
+                  }
+                  | idf mc_as TYPE bal_slch_fer pvg {
+                    verificationInsertion($1,sauvCateg,sauvType,"",0,3);
+                  }; 
 
 
 
-TYPE: mc_int     {strcpy(sauvType,$1);}  
-    | mc_float   {strcpy(sauvType,$1);}
-    | mc_char    {strcpy(sauvType,$1);}
-    | mc_string  {strcpy(sauvType,$1);}
-    | mc_bool    {strcpy(sauvType,$1);}
+TYPE: mc_int   {strcpy(sauvType,"INT");}  
+    | mc_float {strcpy(sauvType,"FLT");}  
+    | mc_char  {strcpy(sauvType,"CHR");}  
+    | mc_string{strcpy(sauvType,"STR");}  
+    | mc_bool  {strcpy(sauvType,"BOL");}  
     ;
 
-DECLARATION_TAB:  bal_ouv idf deuxpt cst_unsigned_int bal_slch_fer DECLARATION_TAB { inserer($2,sauvType,NULL,"",$4,0,0,0);}
+DECLARATION_TAB:  bal_ouv idf deuxpt cst_unsigned_int bal_slch_fer{ insertion($2,"tableau",sauvType,"",$4,3); } DECLARATION_TAB
                 | bal_slch_ouv mc_array bal_fer
                 ;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,59 +112,52 @@ BODY: AFFECTATION BODY
 
 
 /////////////////////////////////////////////////
-AFFECTATION: bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer
-            | bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+AFFECTATION:  bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer {
+                  printf("Val exp affectation =  %f \n",sauvValeur);
+                  //verificationAffectation(idf,sauvValeur,sauvType);
+                  //si est une variable alors on insere X
+                  // sinon ERREUR Affectation constante  
+             
+
+            }
+            | bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer{
+                   InsertionTab($4,$6,sauvVal);
+            }
             ;
 
-X: EXPRESSION_ARITH
+X: EXPRESSION_ARITH  { sauvValeur=$1; sprintf(sauvVal,"%f",$1); }
  | EXPRESSION_COMPARAISON
  | EXPRESSION_LOGIQUE
- | simple_string
- | cst_char
- | cst_bool
+ | simple_string {strcpy(sauvType,"STR"); strcpy(sauvVal,$1);}
+ | cst_char {strcpy(sauvType,"CHR"); strcpy(sauvVal,$1);}
+ | cst_bool {strcpy(sauvType,"BOL"); strcpy(sauvVal,$1);}
 ; 
 /////////////////////////////////////////////////
 
-term: cst_signed_int
-     | cst_float
-     | idf 
-     | idf cr_ouv cst_unsigned_int cr_fer
-     ;
-     
-EXPRESSION_ARITH: EXPRESSION_ARITH plus EXPRESSION_ARITH
-                | EXPRESSION_ARITH moins EXPRESSION_ARITH
-                | EXPRESSION_ARITH divis EXPRESSION_ARITH
-                | EXPRESSION_ARITH mult EXPRESSION_ARITH
-                | plus %prec par_ouv EXPRESSION_ARITH par_fer
-                | moins %prec par_ouv EXPRESSION_ARITH par_fer
-                | divis %prec par_ouv EXPRESSION_ARITH par_fer
-                | mult %prec par_ouv EXPRESSION_ARITH par_fer
-                | term
+EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer { $$ =($2) ; } 
+                 | EXPRESSION_ARITH plus EXPRESSION_ARITH  { $$ = $1 + $3; } 
+                 | EXPRESSION_ARITH moins EXPRESSION_ARITH { $$ = $1 - $3 ; }
+                 | EXPRESSION_ARITH divis EXPRESSION_ARITH { $$ = $1 / $3 ; }
+                 | EXPRESSION_ARITH mult EXPRESSION_ARITH  { $$ = $1 * $3 ;}
+                 | TERM { $$ = $1; }
                 ; 
-
-/* 
-EXPRESSION_ARITH: EXPRESSION_ARITH plus term
-                | EXPRESSION_ARITH moins term
-                | term
-                ;
-term: term mult factor 
-    | term divis factor 
-    | factor
-    ; 
-
-factor: par_ouv EXPRESSION_ARITH par_fer
-      | num 
-      ;
-num:   cst_unsigned_int
-     | cst_float
-     | idf 
-     | idf cr_ouv cst_unsigned_int cr_fer
-     ; */
-
-
-
-
-/////////////////////////////////////////////////
+TERM:  par_ouv cst_int_pos par_fer { $$ = (float)$2; }
+     | par_ouv cst_int_neg par_fer { $$ = (float)$2; }
+     | cst_unsigned_int { $$ = (float)$1; }
+     | cst_float { $$ = $1; }
+     | idf { 
+       sauvState=typeEntite($1);
+       val=verificationValIdf($1,sauvState);
+       printf("SAUV VAL IDF = %f\n",val);
+       $$=sauvValeur;
+     }
+     | idf cr_ouv cst_unsigned_int cr_fer { 
+       sauvValeur=getTab($1,$3);
+       $$=sauvValeur;
+     }
+     ; 
+     
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EXPRESSION_LOGIQUE: and par_ouv EXPRESSIONS par_fer 
                   | or par_ouv EXPRESSIONS par_fer 
@@ -270,9 +259,9 @@ INSTRUCTION_BOUCLE_FOR: AFFECTATION INSTRUCTION_BOUCLE_FOR
 %%
 main()
 {   
-    initialisation();
+    create_hash_table();
     yyparse(); 
-    affichage();
+    affichage_table();
     
 }
     

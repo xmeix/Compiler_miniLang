@@ -1,0 +1,95 @@
+
+        <AFF: T1[3],(x+(+7)+T2[1])/ (555411.3+(-2))/>
+        <AFF: idf, 'a' />
+        <AFF: a, SUP(a,(x+(a-(+7)+b))/ (5254.333-(-2)))/>
+        <INPUT: idf  " & " />
+        <AFF: a, 'a' />
+        <AFF: T1[3], (x+(+7)+T2[1])/ (555411.3-(+2))/>
+         <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+         <OUTPUT: "hdsf & " + idf + " kjsdfksd "+ " fsnf # "+idf + "jkfskjfn"/>
+         <OUTPUT: " kjsdfksd "+" jkfskjfn $ "+idf + " fsnf % "+idf />
+         <OUTPUT: "hdsf & kndcs"+idf+"kjsdfksd"+" # "+idf+"jkfskjfn"/>
+
+    <IF: AND(EGA(a,3),SUP(7,b)) >
+        <THEN>
+                <OUTPUT: " a = b " />
+                <AFF: idf, 8 + 9/>
+                <INPUT: idf  " &" />
+                <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+         
+        </THEN>
+        <ELSE>
+            <OUTPUT: "condition non verifiee" />
+            <OUTPUT: " a = b " />
+                <AFF: idf, 8 + 9/>
+                <INPUT: idf  " &" />
+                <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+                        
+                        <IF: AND(EGA(a,3),SUP(7,b)) >
+                            <THEN>
+                                    <OUTPUT: " a = b " />
+                                    <AFF: idf, 8 + 9/>
+                                    <INPUT: idf  " &" />
+                                    <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+                            
+                            </THEN>
+                            <ELSE>
+                                    <OUTPUT: "condition non verifiee" />
+                                    <OUTPUT: " a = b " />
+                                    <AFF: idf, 8 + 9/>
+                                    <INPUT: idf  " &" />
+                                    <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+                            </ELSE> 
+                    </IF>
+                    <IF:AND(EGA(a,3),SUP(7,b))>
+                            <THEN>
+                                    <OUTPUT: " a = b " />
+                                    <AFF: idf, 8 + 9 />
+                                    <INPUT: idf  " &" />
+                                    <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+                            
+                            </THEN>
+                    </IF>
+       </ELSE> 
+    </IF>
+
+    <DO>
+       
+    <WHILE :AND(EGA(a,3),SUP(7,b))/>
+    </DO>
+
+        <FOR i=1 UNTIL a>
+        <OUTPUT: " a = b " />
+                                    <AFF: idf, 8 + 9/>
+                                    <INPUT: idf  " &" />
+                                    <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+                            
+            <IF: AND(EGA(a,3),SUP(7,b)) >
+                            <THEN>
+                                    <OUTPUT: " a = b " />
+                                    <AFF: idf,8 + 9 />
+                                    <INPUT: idf  " &" />
+                                    <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+                            
+                            </THEN>
+                    </IF>
+            <DO>
+                <IF: AND(EGA(a,3),SUP(7,b)) >
+                            <THEN>
+                                    <OUTPUT: " a = b " />
+                                    <AFF: idf, 8 + 9/>
+                                    <INPUT: idf  " &" />
+                                    <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+                            
+                            </THEN>
+                    </IF>
+            <WHILE : AND(EGA(a,3),SUP(7,b)) />
+            </DO>
+            <OUTPUT: " a = b " />
+                                    <AFF: idf, 8 + 9 />
+                                    <INPUT: idf  " &" />
+                                    <OUTPUT: "hdsf @ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+idf />
+                            
+        </FOR>
+
+        <AFF: a, 8 + 990 - 9 * 10 />
