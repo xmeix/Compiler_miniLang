@@ -7,11 +7,18 @@
 	extern yytext;
     char sauvType[20];
     char sauvVal[100];
+    int typeExp = 0;
     int sauvCateg = 1;
     int sauvState;
-    float val;
+    float val; 
+    char val1[100],val2[100];
     float sauvValeur;
-    
+    char res[20];
+    int  resComp;
+    char valSigne[100];
+    int valAnd=0;
+    int valOr=0;
+    int valLog;
 %} 
 %union{
   int entier;
@@ -29,7 +36,10 @@
 %token mc_if mc_then mc_else mc_do mc_while mc_for mc_until
 
 %type <reel> TERM 
-%type <reel> EXPRESSION_ARITH
+%type <reel> EXPRESSION_ARITH 
+%type <string>EXPRESSION_COMPARAISON
+%type <entier> MC_COMPARAISON
+%type <string>EXPRESSION_LOGIQUE 
 %left or
 %left and 
 %right not
@@ -113,75 +123,168 @@ BODY: AFFECTATION BODY
 
 /////////////////////////////////////////////////
 AFFECTATION:  bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer {
-                  printf("Val exp affectation =  %f \n",sauvValeur);
-                  //verificationAffectation(idf,sauvValeur,sauvType);
-                  //si est une variable alors on insere X
-                  // sinon ERREUR Affectation constante  
-             
-
+                  printf("Val exp affectation 1=  %d \n",sauvValeur);
+                  
+                  if(verificationType($4,typeExp)==0 && isItConst($4) !=0 ){
+                    InsertionIdf($4,typeExp,sauvVal);
+                  }
+                  typeExp=0;
             }
             | bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer{
-                   InsertionTab($4,$6,sauvVal);
+                   
+                   if(categDeclaredAs($4,"tableau")==0){ 
+                     printf("Val exp affectation2 =  %f \n",sauvValeur);
+                     if(verificationType($4,typeExp)==0){
+                       InsertionTab($4,$6,sauvVal);
+                     }
+                     
+                    
+                   }
             }
             ;
 
 X: EXPRESSION_ARITH  { sauvValeur=$1; sprintf(sauvVal,"%f",$1); }
- | EXPRESSION_COMPARAISON
- | EXPRESSION_LOGIQUE
- | simple_string {strcpy(sauvType,"STR"); strcpy(sauvVal,$1);}
- | cst_char {strcpy(sauvType,"CHR"); strcpy(sauvVal,$1);}
- | cst_bool {strcpy(sauvType,"BOL"); strcpy(sauvVal,$1);}
+ | EXPRESSION_COMPARAISON { typeExp = 3;}
+ | EXPRESSION_LOGIQUE { typeExp = 3;  }
+ | simple_string {strcpy(sauvType,"STR"); strcpy(sauvVal,$1);  typeExp = 2;}
+ | cst_char {strcpy(sauvType,"CHR"); strcpy(sauvVal,$1); typeExp = 2;}
+ | cst_bool {strcpy(sauvType,"BOL"); strcpy(sauvVal,$1); typeExp = 3;}
 ; 
 /////////////////////////////////////////////////
 
 EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer { $$ =($2) ; } 
-                 | EXPRESSION_ARITH plus EXPRESSION_ARITH  { $$ = $1 + $3; } 
+                 | EXPRESSION_ARITH plus EXPRESSION_ARITH  { $$ = $1 + $3; printf ("+\n");} 
                  | EXPRESSION_ARITH moins EXPRESSION_ARITH { $$ = $1 - $3 ; }
                  | EXPRESSION_ARITH divis EXPRESSION_ARITH { $$ = $1 / $3 ; }
                  | EXPRESSION_ARITH mult EXPRESSION_ARITH  { $$ = $1 * $3 ;}
                  | TERM { $$ = $1; }
                 ; 
-TERM:  par_ouv cst_int_pos par_fer { $$ = (float)$2; }
-     | par_ouv cst_int_neg par_fer { $$ = (float)$2; }
+TERM:  par_ouv cst_int_neg par_fer { $$ = (float)$2;}
      | cst_unsigned_int { $$ = (float)$1; }
-     | cst_float { $$ = $1; }
+     | cst_float { $$ = $1; typeExp=1; }
      | idf { 
+       printf("idf = %s\n",$1);
        sauvState=typeEntite($1);
-       val=verificationValIdf($1,sauvState);
-       printf("SAUV VAL IDF = %f\n",val);
-       $$=sauvValeur;
+       if(sauvState==1) typeExp=1;
+       getValueIdf($1,res); 
+       sauvValeur=atof(res);
+       $$=atof(res);
      }
      | idf cr_ouv cst_unsigned_int cr_fer { 
-       sauvValeur=getTab($1,$3);
+       
+       sauvState=typeEntite($1);
+       if(sauvState==1) typeExp=1;
+       sauvValeur=getValueTab($1,$3);
        $$=sauvValeur;
      }
      ; 
      
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EXPRESSION_LOGIQUE: and par_ouv EXPRESSIONS par_fer 
-                  | or par_ouv EXPRESSIONS par_fer 
-                  | not par_ouv TYPE_EXP par_fer
-                   ; 
+EXPRESSION_LOGIQUE: and par_ouv { valLog = 0; valAnd=0; valOr=0;} EXPRESSIONS par_fer {
+                    if(valAnd == 0) {strcpy(sauvVal,"TRUE"); strcpy($$,"TRUE");}
+                    else if(valAnd == 1) {strcpy(sauvVal,"FALSE"); strcpy($$,"FALSE");
+                    }
+
+                    printf("Resultat: valAnd = %d \n",valAnd);
+                  }
+                  | or par_ouv { valLog = 1; valAnd=0; valOr=0;} EXPRESSIONS par_fer  {
+                    if(valOr == 0) {strcpy(sauvVal,"FALSE"); strcpy($$,"FALSE");}
+                    else if(valOr == 1) {strcpy(sauvVal,"TRUE"); strcpy($$,"TRUE");}
+                  }
+                  | not par_ouv  { valLog = 2; valAnd=0; valOr=0;} TYPE_EXP par_fer{
+                    if(strcmp(sauvVal,"TRUE")==0) strcpy($$,"TRUE");
+                    else if (strcmp(sauvVal,"FALSE")==0) strcpy($$,"FALSE");
+                  }
+                  ; 
 
 EXPRESSIONS:  TYPE_EXP vrg EXPRESSIONS
-            | TYPE_EXP vrg TYPE_EXP
-             ;
-TYPE_EXP : EXPRESSION_LOGIQUE
-         | EXPRESSION_COMPARAISON  
-         | idf
-         | cst_bool 
-         | idf cr_ouv cst_unsigned_int cr_fer  
+            | TYPE_EXP vrg TYPE_EXP ;
+
+
+TYPE_EXP : EXPRESSION_LOGIQUE { 
+          
+          if(valLog == 0){
+            if(strcmp($1,"FALSE")==0) valAnd = 1; //false
+          }else if(valLog == 1){
+            if(strcmp($1,"TRUE")==0) valOr = 1; //true
+          }else if(valLog == 2){
+            if(strcmp($1,"TRUE")==0) strcpy(sauvVal,"FALSE");
+            else if (strcmp($1,"FALSE")==0) strcpy(sauvVal,"TRUE");
+          }
+            
+         } 
+         | EXPRESSION_COMPARAISON { 
+           
+           if(valLog == 0){
+            if(strcmp($1,"FALSE")==0) valAnd = 1; //false
+          }else if(valLog == 1){
+            if(strcmp($1,"TRUE")==0) valOr = 1; //true
+          }else if(valLog == 2){
+            if(strcmp($1,"TRUE")==0) strcpy(sauvVal,"FALSE");
+            else if (strcmp($1,"FALSE")==0) strcpy(sauvVal,"TRUE");
+          }
+         } 
+         | idf { 
+            if(valLog == 0){
+            if(ValueIdfBol($1)==1) valAnd = 1; //false
+             }else if(valLog == 1){
+            if(ValueIdfBol($1)==0) valOr = 1; //true
+          } else if(valLog == 2){
+            if(ValueIdfBol($1)==0) strcpy(sauvVal,"FALSE");
+            else if (ValueIdfBol($1)==1) strcpy(sauvVal,"TRUE");
+          }      
+         }
+         | cst_bool {
+           
+           if(valLog == 0){
+            if(strcmp($1,"FALSE")==0) valAnd = 1; //false
+          }else if(valLog == 1){
+            if(strcmp($1,"TRUE")==0) valOr = 1; //true
+          }else if(valLog == 2){
+            if(strcmp($1,"FALSE")==0) strcpy(sauvVal,"TRUE");
+            else if (strcmp($1,"TRUE")==0) strcpy(sauvVal,"FALSE");
+          }
+          
+         }
+         | idf cr_ouv cst_unsigned_int cr_fer{
+           
+          if(valLog == 0){
+            if(ValueTabBol($1,$3)==1) valAnd = 1; //false
+          }else if(valLog == 1){
+            if(ValueTabBol($1,$3)==0) valOr = 1; //true
+          }else if(valLog == 2){
+            if(ValueTabBol($1,$3)==0) strcpy(sauvVal,"FALSE");
+            else if (ValueTabBol($1,$3)==1) strcpy(sauvVal,"TRUE");
+          }   
+            
+         }  
          ;
 /////////////////////////////////////////////////
-EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer;
+EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer{
+   
+  sprintf(val1,"%f",(float)$3);
+  sprintf(val2,"%f",(float)$5);
+  sprintf(valSigne,"%d",$1);
+  resComp=resultatComparaison(val1,val2,valSigne);
+  //printf("Resultat: %d \n",resComp);
+  if(resComp == 0){
+    strcpy(sauvVal,"TRUE");
+    strcpy($$,"TRUE");
+  }else if(resComp ==1 ){
+    strcpy(sauvVal,"FALSE");
+    strcpy($$,"FALSE");
 
-MC_COMPARAISON: sup
-              | supeg
-              | infeg
-              | inf 
-              | ega
-              | dif; 
+
+  }
+};
+
+MC_COMPARAISON: sup { $$=0; }
+              | supeg { $$=1 ;}
+              | infeg { $$=2 ;}
+              | inf { $$=3 ;}
+              | ega { $$=4 ;}
+              | dif { $$=5 }; 
 /////////////////////////////////////////////////
 
 /////////////////////////////////////////////////

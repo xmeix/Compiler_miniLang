@@ -12,20 +12,20 @@
             <nom_tableau3: 30/>  
             <nom_tableau4: 20/> 
         </ARRAY>  
-        <G AS FLT /> ;
+        <G AS BOL /> ;
         < T|U AS INT /> ;
         < Y AS INT /> ;
         < F  AS INT /> ; 
          < A AS INT /> ; 
           < B AS INT /> ; 
          
-         <ARRAY AS STR > 
+         <ARRAY AS INT > 
             <nom_tableau5: 20/>  
             <nom_tableau6: 20/> 
         </ARRAY> 
     </ SUB VARIABLE >
     <SUB CONSTANTE> 
-        <nom_constante_9 = (+1.5) />;
+        <nom_constante_9 = 10 />;
         <nom_constante_5 = "hello" />;
         <nom_constante_10 = (-150.11) />;
         <nom_constante_11 = (+32767) />;
@@ -33,13 +33,14 @@
         <nom_constante_2  AS FLT />; 
         <nom_constante_7 = 'a' />;
         <idf|idf2 AS INT /> ; 
-        <nom_constante_6 = 20 />;
+        <nom_constante_6 = 7.3 />;
         <const = FALSE />;
     </SUB CONSTANTE>
     
     <body>
 
-        <AFF: idf , nom_constante_9 + 160 />
+        <AFF: G, AND(FALSE,INFE((9+ 7+ 10)/ (5.3-(-2)),(9+ 7+ 10)/ (5.3-(-2))))/> 
+        
 
      </body>
 

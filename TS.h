@@ -158,9 +158,33 @@ void InsertionTab(char idf[],int position,char *valeur){
       ///COPIE DANS TEMP POUR AFFICHER  
       
       printf("Temporary[%d] = %s \n",position,temporary[position]);
+    
     }
 
 }
+
+int categDeclaredAs(char entite[],char categ[]){
+
+    element *p;
+    int cle; 
+    cle = fonction_hachage(entite);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant){
+      if(strcmp(p->name,entite)==0)
+      {
+      //   printf("p->name=%s\n",p->name);
+      //   printf("p->categorie=%s\n",p->categorie);
+
+        if(strcmp(p->categorie,categ)==0){
+           return 0;//true // declared as table 
+        }
+      }
+    }
+
+  printf("Erreur semantique : Entite pas declaré comme un %s \n",categ);
+  exit(0);
+
+}
+
 
 float getValueTab(char idf[],int position){
     element *p;
@@ -185,46 +209,104 @@ float getValueTab(char idf[],int position){
 
   
 }
-void verificationType(char entite1[],char Type1[], char entite2[], char Type2[]){
 
-  if(strcmp(Type1,Type2)!=0){
-    printf("Erreur sémantique: non-compatibilité de type des entités %s et %s\n",entite1,entite2);
+
+int getValueIdf(char idf[], char* res){
+  
+    element *p;
+    int cle;
+    char **temporary;
+    char val[50];
+    cle = fonction_hachage(idf);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant){
+      if(strcmp(p->name,idf)==0)
+      {
+        if(p->state==0){
+            printf("HERE\n");
+            sprintf(res,"%f",(float)(p->val));
+            printf("res ========================= %s\n",res);
+            return 0;
+        }else if(p->state==1){
+            printf("HERE\n");
+            sprintf(res,"%f",p->valF);
+            printf("res ========================= %s\n",res);
+            return 0;
+
+        }else if(p->state==2){
+             printf("Erreur semantique: une expression arithmetique contient un idf %s de type STRING\n",idf);
+            exit(0);
+        }
+  
+      }
+    } 
+    printf("Erreur semantique: Affectation d'une expression arithmetique avec un idf %s sans valeur \n",idf);
+    exit(0);
+    
+}
+int verificationType(char entite[],int type){
+
+  if(typeEntite(entite) == type){
+    return 0;
+  }else {
+
+    printf("Erreur semantique : Incompatibilite de type de l'entite lexicale %s \n",entite);
     exit(0);
   }
 
-}
-float verificationValIdf(char idf[],int state){
 
-  //On doit parcourir table de hachage et verifier si l entite avec le nom idf a une valeur 
-  //si la valeur existe alors return val; 
-  //sinon Erreur Affectation idf sans Valeur dans ExpAr
-  element *p;
-  int cle;
-  float val;
-  cle = fonction_hachage(idf);
+
+}
+void InsertionIdf(char entite[],int type,char valeur[]){
+
+   element *p;
+   int cle;
+
+  cle = fonction_hachage(entite);
   for(p=table_hachage[cle];p!=NULL;p=p->suivant)
-    if(strcmp(p->name,idf)==0)
     {
-      if(state == 0)  return (float)p->val;
-      if(state == 1)  {
-      
-        val = p->valF;
-        printf("Val = %f\n",val);
-        return val;
+      if(strcmp(p->name,entite)==0)
+        { 
+          
+          
+          if(type == 0){
+            printf("HERE\n");
+            p->val = atoi(valeur);
+            p->state = 0;
+          } else if(type == 1){
+            p->valF=atof(valeur);
+            p->state=1;
+          } else if(type == 2){ 
+            strcpy(p->valStr,valeur);
+            p->state = 2;
+          }else if(type == 3){
+            strcpy(p->valStr,valeur);
+            p->state = 2;
+          }
 
-      }
-      if(state == 2) {
-         
-         printf("Erreur semantique: une expression arithmetique contient un idf %s de type STRING\n",idf);
-         exit(0);
-      }
-
-      
+        }
+        
+        
     }
-  
-    printf("Erreur semantique: Affectation d'une expression arithmetique avec un idf %s sans valeur \n",idf);
-    exit(0);
+
 }
+int isItConst(char entite[]){
+    element *p;
+    int cle; 
+    cle = fonction_hachage(entite);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant){
+      if(strcmp(p->name,entite)==0)
+      {
+        if((strcmp(p->categorie,"constante")==0 && p->state==3) || strcmp(p->categorie,"variable")==0 )
+        { 
+          return 1; //si constante et pas de valeur ... OU variable 
+        }else {
+          printf("Erreur semantique : Affectation d'une valeur a une constante %s contenant une valeur\n",entite);
+          exit(0);
+        }
+      }
+    }
+}
+
 
 int typeEntite(char entite[])
 { 
@@ -233,10 +315,24 @@ int typeEntite(char entite[])
 
   cle = fonction_hachage(entite);
   for(p=table_hachage[cle];p!=NULL;p=p->suivant)
-    if(strcmp(p->name,entite)==0)
     {
-      return p->state;
-    }
+      if(strcmp(p->name,entite)==0)
+        {
+          if(strcmp(p->type,"INT")==0){
+            return 0;
+          }else if(strcmp(p->type,"FLT")==0){
+            return 1;
+          }else if(strcmp(p->type,"STR")==0 || strcmp(p->type,"CHR")==0){
+            return 2;
+          }else if(strcmp(p->type,"BOL")==0){
+            return 3;
+          }
+
+        }
+        }
+      
+      
+      return -1;
 }
 
 void verificationInsertion(char entite[],int sauvCateg,char type[],char valeur[],int taille,int sauvState){
@@ -249,6 +345,15 @@ void verificationInsertion(char entite[],int sauvCateg,char type[],char valeur[]
   }
 
 }
+
+verificationAffectation(char entite[],int type,char valeur[]){
+  if(typeEntite(entite) == type){
+
+  }
+}
+
+
+
 
 // void insertion(element **table_hachage,char entite[],char categorie[],char type[],char valeur[],int taille){
 
@@ -269,6 +374,92 @@ void verificationInsertion(char entite[],int sauvCateg,char type[],char valeur[]
 //   }
 
 // }
+
+////////////////////////////////////////////////////////////////////////////////////////
+
+int resultatComparaison(char val1[] ,char val2[], char signe []){
+  
+
+  int typ = atoi(signe);
+
+  switch(typ){
+   
+      case 0: {if(atof(val1)>atof(val2)) return 0;} break;
+      case 1:{if(atof(val1)>=atof(val2)) return 0;}   break;
+      case 2:{if(atof(val1)<=atof(val2)) return 0;} break;
+      case 3:{if(atof(val1)<atof(val2)) return 0;} break;
+      case 4:{if(atof(val1)==atof(val2)) return 0;} break;
+      case 5:{if(atof(val1)!=atof(val2)) return 0;} break;
+      default: printf("Val1 = %f , Val2 = %f , signe = %d \n",val1,val2,signe); break;
+  }
+
+  return 1;//false 
+}
+ 
+int ValueTabBol(char entite[],int position){
+
+    element *p;
+    int cle;
+    char **temporary;
+    int val;
+
+    cle = fonction_hachage(entite);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant)
+      {
+        if(strcmp(p->name,entite)==0 && strcmp(p->categorie,"tableau")==0)
+          { 
+
+            temporary= (char**) malloc((p->taille)*sizeof(char*));
+            memcpy(temporary, p->arrayTab,p->taille);
+            if(strcmp(temporary[position],"TRUE")==0) return 0;//true
+            else if(strcmp(temporary[position],"FALSE")==0) return 1;//false
+
+          }
+      }
+
+  return -1;
+}
+
+int ValueIdfBol(char entite[]){
+
+    element *p;
+    int cle;
+    char **temporary;
+    int val;
+
+    cle = fonction_hachage(entite);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant)
+      {
+        if(strcmp(p->name,entite)==0 && strcmp(p->categorie,"variable")==0)
+          { 
+            
+            if(strcmp(p->valStr,"TRUE")==0) return 0;//true
+            else if(strcmp(p->valStr,"FALSE")==0) return 1;//false
+
+          }
+      }
+
+  return -1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //affiche la liste de chaque case de la table de hachage 
 void affichage_liste(element *table,int j){

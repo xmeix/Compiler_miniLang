@@ -4,12 +4,17 @@
 	#include <string.h>
 	#include "TS.h"
     #include "syntaxique.tab.h"
-	extern YYSTYPE yylval;
     extern nb_ligne;
 	extern Col;
 	char t[100];
     int i=1; 
 	int k;
+	extern YYSTYPE yylval;
+	/*
+	A REVOIR : 
+	-PRBLM INPUT coté droit quand on enleve l'espace une erreur se prod " @"
+	-MEME PRBLM les deux cotés output "@"
+	*/
 %}
 Signe [!\'-\.\:-\?\[\{-\}]
 MESSAGE ({lettre}|{chiffre}|{Signe}|" "|"-")*
