@@ -105,8 +105,8 @@ Grammaire
 
    67 TYPE_EXP: EXPRESSION_LOGIQUE
    68         | EXPRESSION_COMPARAISON
-   69         | idf
-   70         | cst_bool
+   69         | cst_bool
+   70         | idf
    71         | idf cr_ouv cst_unsigned_int cr_fer
 
    72 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer
@@ -186,7 +186,7 @@ bal_ouv (263) 1 2 3 4 6 7 10 11 12 31 35 40 41 79 91 93 94 97 100 103
 bal_fer (264) 1 2 3 4 7 8 10 13 32 39 93 94 97 102 103 111 112 119
 bal_slch_fer (265) 14 24 31 40 41 82 83 103
 bal_slch_ouv (266) 1 8 13 32 39 93 94 102 103 119
-idf (267) 1 14 23 24 31 40 41 57 58 69 71 79 80 82 111 112
+idf (267) 1 14 23 24 31 40 41 57 58 70 71 79 80 82 111 112
 mc_as (268) 7 24
 pvg (269) 14 24
 ou (270) 23
@@ -202,7 +202,7 @@ cst_unsigned_int (279) 22 31 41 55 58 71
 cst_int_pos (280) 20
 cst_int_neg (281) 21 54
 cst_float (282) 16 56
-cst_bool (283) 17 47 70
+cst_bool (283) 17 47 69
 cst_char (284) 18 46
 plus (285) 49 80 81
 moins (286) 50
@@ -2170,19 +2170,19 @@ INSTRUCTION_BOUCLE_FOR (106)
 
 état 202
 
-   69 TYPE_EXP: idf .
+   70 TYPE_EXP: idf .
    71         | idf . cr_ouv cst_unsigned_int cr_fer
 
     cr_ouv  décalage et aller à l'état 228
 
-    $défaut  réduction par utilisation de la règle 69 (TYPE_EXP)
+    $défaut  réduction par utilisation de la règle 70 (TYPE_EXP)
 
 
 état 203
 
-   70 TYPE_EXP: cst_bool .
+   69 TYPE_EXP: cst_bool .
 
-    $défaut  réduction par utilisation de la règle 70 (TYPE_EXP)
+    $défaut  réduction par utilisation de la règle 69 (TYPE_EXP)
 
 
 état 204

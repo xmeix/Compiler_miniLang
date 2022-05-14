@@ -39,7 +39,7 @@
     
     <body>
 
-        <AFF: G, AND(FALSE,INFE((9+ 7+ 10)/ (5.3-(-2)),(9+ 7+ 10)/ (5.3-(-2))))/> 
+        <AFF: G, AND(TRUE,TRUE)/> 
         
 
      </body>

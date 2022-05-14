@@ -45,7 +45,7 @@
 %right not
 %nonassoc sup inf supeg infeg ega dif
 %left plus moins
-%left mult divis
+%left mult divis 
 %start S 
 %%
 S: bal_ouv mc_exl mc_docprogram idf bal_fer  DEC_TOTAL bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
@@ -224,16 +224,6 @@ TYPE_EXP : EXPRESSION_LOGIQUE {
             if(strcmp($1,"TRUE")==0) strcpy(sauvVal,"FALSE");
             else if (strcmp($1,"FALSE")==0) strcpy(sauvVal,"TRUE");
           }
-         } 
-         | idf { 
-            if(valLog == 0){
-            if(ValueIdfBol($1)==1) valAnd = 1; //false
-             }else if(valLog == 1){
-            if(ValueIdfBol($1)==0) valOr = 1; //true
-          } else if(valLog == 2){
-            if(ValueIdfBol($1)==0) strcpy(sauvVal,"FALSE");
-            else if (ValueIdfBol($1)==1) strcpy(sauvVal,"TRUE");
-          }      
          }
          | cst_bool {
            
@@ -246,7 +236,18 @@ TYPE_EXP : EXPRESSION_LOGIQUE {
             else if (strcmp($1,"TRUE")==0) strcpy(sauvVal,"FALSE");
           }
           
+         } 
+         | idf { 
+            if(valLog == 0){
+            if(ValueIdfBol($1)==1) valAnd = 1; //false
+             }else if(valLog == 1){
+            if(ValueIdfBol($1)==0) valOr = 1; //true
+          } else if(valLog == 2){
+            if(ValueIdfBol($1)==0) strcpy(sauvVal,"FALSE");
+            else if (ValueIdfBol($1)==1) strcpy(sauvVal,"TRUE");
+          }      
          }
+         
          | idf cr_ouv cst_unsigned_int cr_fer{
            
           if(valLog == 0){
