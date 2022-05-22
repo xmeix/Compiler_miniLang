@@ -28,8 +28,8 @@
     int pos;
 
     ////////// VARIABLES QUAD ///////////////////
-    int Fin_if=0,deb_else=0 , Fin_Do=0 , DebInstDo=0 , DebCondDo = 0;
-    int qc=0;
+    int Fin_if=0,deb_else=0 , Fin_For=0 , DebInstDo=0 , DebCondDo = 0 ,cptCondition=0 , verifFor=0;
+    int qc=0 , cpt;
     char tmp [20];
 
 %} 
@@ -60,6 +60,8 @@
 %type <string> OUTPUT
 %type <entier> CONDITION
 %type <string> OpLog
+%type <entier> SWITCH_INT
+%type <entier> SWITCHID_INT
 %left or
 %left and 
 %right not
@@ -68,20 +70,28 @@
 %left mult divis 
 %start S 
 %%
-S: bal_ouv mc_exl mc_docprogram idf bal_fer  DEC_TOTAL bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
+S: bal_ouv mc_exl mc_docprogram idf bal_fer  bal_ouv mc_sub mc_variable bal_fer DECLARATION DECLARATION_CONST  bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
                   {printf("programme syntaxiquement correct");
                                 YYACCEPT;}
+|  bal_ouv mc_exl mc_docprogram idf bal_fer   DECLARATION_CONST bal_ouv mc_sub mc_variable bal_fer DECLARATION bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
+                  {printf("programme syntaxiquement correct");
+                                YYACCEPT;}
+|  bal_ouv mc_exl mc_docprogram idf bal_fer  bal_ouv mc_sub mc_variable bal_fer DECLARATION bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
+                  {printf("programme syntaxiquement correct");
+                                YYACCEPT;}
+|  bal_ouv mc_exl mc_docprogram idf bal_fer  DECLARATION_CONST bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer
+                  {printf("programme syntaxiquement correct");
+                                YYACCEPT;}                                
 ;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+/* 
 DEC_TOTAL: bal_ouv mc_sub mc_variable bal_fer DECLARATION DECLARATION_CONST 
          | DECLARATION_CONST bal_ouv mc_sub mc_variable bal_fer DECLARATION
          | bal_ouv mc_sub mc_variable bal_fer DECLARATION
          | DECLARATION_CONST
          ;
-
-
+ */
 
 DECLARATION:  bal_ouv DECLARATION_SIMPLE DECLARATION
             | bal_ouv mc_array mc_as TYPE bal_fer DECLARATION_TAB DECLARATION 
@@ -104,9 +114,9 @@ SWITCH_CST_TYPES: SWITCH_INT
                 | cst_char {strcpy(sauvVal,$1);   sauvState=2; strcpy(sauvType,"CHR");}
                 | simple_string {strcpy(sauvVal,$1); sauvState=2; strcpy(sauvType,"STR");}
                 ;
-SWITCH_INT: par_ouv cst_int_pos par_fer {sprintf(sauvVal,"%d",$2); sauvState=0; strcpy(sauvType,"INT");}
-          | par_ouv cst_int_neg par_fer {sprintf(sauvVal,"%d",$2); sauvState=0; strcpy(sauvType,"INT");}
-          | cst_unsigned_int {sprintf(sauvVal,"%d",$1); sauvState=0; strcpy(sauvType,"INT");}
+SWITCH_INT: par_ouv cst_int_pos par_fer {sprintf(sauvVal,"%d",$2); sauvState=0; strcpy(sauvType,"INT"); $$ = $2;}
+          | par_ouv cst_int_neg par_fer {sprintf(sauvVal,"%d",$2); sauvState=0; strcpy(sauvType,"INT"); $$ = $2;}
+          | cst_unsigned_int {sprintf(sauvVal,"%d",$1); sauvState=0; strcpy(sauvType,"INT"); $$ = $1;}
 ;
 //////////////////////////////////////////////////////////////
 DECLARATION_SIMPLE: idf ou DECLARATION_SIMPLE{
@@ -131,16 +141,19 @@ DECLARATION_TAB:  bal_ouv idf deuxpt cst_unsigned_int bal_slch_fer{ insertion($2
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 BODY: AFFECTATION BODY
     | INPUT BODY
-    | bal_ouv mc_output deuxpt OUTPUT {AfficheInverseOutput(buffer); }BODY
+    | bal_ouv mc_output deuxpt OUTPUT {
+              InverserChaine(buffer);  
+              printf("%s\n",buffer);
+              quadr("OUTPUT",buffer,"vide","vide");
+              strncpy(buffer, "", sizeof(buffer));  
+              }BODY
     | INST_IF BODY
     | BOUCLE_DO BODY 
     | BOUCLE_FOR BODY
     | bal_slch_ouv mc_body bal_fer
     ;
     
-
-
-
+    
 /////////////////////////////////////////////////
 AFFECTATION:  bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer {
   
@@ -522,6 +535,7 @@ BOUCLE_DO_B: BOUCLE_DO_A INSTRUCTION_BOUCLE_DO {
 BOUCLE_DO_C: BOUCLE_DO_B CONDITION { //R3
     sprintf(tmp,"%d",DebInstDo);
      quadr("BNZ",tmp,"tempInst","vide");
+    
 };
 
 
@@ -534,7 +548,13 @@ BOUCLE_DO: BOUCLE_DO_C bal_slch_fer bal_slch_ouv mc_do bal_fer {
 
 INSTRUCTION_BOUCLE_DO: AFFECTATION INSTRUCTION_BOUCLE_DO
                 | INPUT INSTRUCTION_BOUCLE_DO
-                | bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_DO
+                | bal_ouv mc_output deuxpt OUTPUT{  
+                      
+                    printf("%s\n",buffer);
+                    InverserChaine(buffer);  
+                    printf("%s\n",buffer);
+                    quadr("OUTPUT",buffer,"vide","vide");
+                    strncpy(buffer,"", sizeof(buffer));}INSTRUCTION_BOUCLE_DO
                 | INST_IF INSTRUCTION_BOUCLE_DO
                 | BOUCLE_DO INSTRUCTION_BOUCLE_DO
                 | BOUCLE_FOR INSTRUCTION_BOUCLE_DO
@@ -543,13 +563,51 @@ INSTRUCTION_BOUCLE_DO: AFFECTATION INSTRUCTION_BOUCLE_DO
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-            |bal_ouv mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
-          ;
+
+BOUCLE_FOR_A: bal_ouv mc_for idf egal SWITCH_INT{ //R1
+  Declared($3);
+  if(typeEntite($3)!=0) {
+        printf("Erreur semantique : le type de l'entite %s est incompatible au type de la condition For \n",$3);
+        exit(0);
+    }
+  cptCondition = qc ; 
+
+};
+
+BOUCLE_FOR_B: BOUCLE_FOR_A  mc_until SWITCHID_INT{//R2
+  Fin_For = qc;  
+  quadr("BZ","","vide","vide");
+ 
+
+};
+
+
+BOUCLE_FOR: BOUCLE_FOR_B bal_fer INSTRUCTION_BOUCLE_FOR{
+  //R3
+ 
+  sprintf(tmp,"%d",cptCondition); 
+  quadr("BR",tmp,"vide","vide");
+  
+  sprintf(tmp,"%d",qc);
+  ajour_quad(Fin_For,1,tmp);
+  printf("pgm correct\n"); 
+}
+
+SWITCHID_INT: idf { 
+    if(verificationConditionFor($1) == 1) {$$ = getValIdf($1); printf("IDFINT %s = %d \n",$1,getValIdf($1));}
+   }
+            | SWITCH_INT { $$ = $1; }
+            ;
 
 INSTRUCTION_BOUCLE_FOR: AFFECTATION INSTRUCTION_BOUCLE_FOR
                 | INPUT INSTRUCTION_BOUCLE_FOR
-                | bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR
+                | bal_ouv mc_output deuxpt OUTPUT {
+                   InverserChaine(buffer);  
+                    printf("%s\n",buffer);
+                    quadr("OUTPUT",buffer,"vide","vide");
+                    strncpy(buffer, "", sizeof(buffer));  
+              
+              } INSTRUCTION_BOUCLE_FOR
                 | INST_IF INSTRUCTION_BOUCLE_FOR
                 | BOUCLE_DO INSTRUCTION_BOUCLE_FOR
                 | BOUCLE_FOR INSTRUCTION_BOUCLE_FOR

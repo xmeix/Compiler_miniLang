@@ -254,6 +254,75 @@ int getValueIdf(char idf[], char* res){
     
 }
 
+int getValIdfInt(char entite[]){
+  
+    element *p;
+    int cle;
+    char **temporary;
+    char val[50];
+    cle = fonction_hachage(entite);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant){
+      if(strcmp(p->name,entite)==0 )
+      {
+        return p->val;
+      }
+    }
+
+
+}
+
+int verificationConditionFor(char entite[]){
+
+
+  if(Declared(entite)==1 && typeEntite(entite)==0 && HasValue(entite)==1 )
+  {
+    return 1;
+  }else {
+    if(typeEntite(entite)!=0) {
+        printf("Erreur semantique : le type de l'entite %s est incompatible au type de la condition For \n",entite);
+        exit(0);
+    }
+  }
+  
+  return 0; 
+}
+
+int HasValue(char entite[]){
+  
+    element *p;
+    int cle;  
+    cle = fonction_hachage(entite);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant){
+      if(strcmp(p->name,entite)==0 && (p->state!=3) )
+      {
+        return 1;
+      }
+    }
+    
+    printf("Erreur semantique : l'entite %s est declaree et sans valeur  \n",entite);
+    exit(0);
+    return 0;
+}
+
+int Declared(char entite[]){
+  
+    element *p;
+    int cle;  
+    cle = fonction_hachage(entite);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant){
+      if(strcmp(p->name,entite)==0 )
+      {
+
+        return 1;
+      }
+    }
+    
+    printf("Erreur semantique : l'entite %s est non declaree \n",entite);
+    exit(0);
+
+    return 0;
+}
+
 int verificationType(char entite[],int type){
 
   if(typeEntite(entite) == type){
@@ -262,8 +331,6 @@ int verificationType(char entite[],int type){
     printf("Erreur semantique : Incompatibilite de type de l'entite lexicale %s \n",entite);
     exit(0);
   }
-
-
 
 }
 void InsertionIdf(char entite[],int type,char valeur[]){

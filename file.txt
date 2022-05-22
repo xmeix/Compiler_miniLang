@@ -108,3 +108,31 @@
         </FOR>
 
         <AFF: a, 8 + 990 - 9 * 10 />
+
+
+        <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
+    <DO>
+           
+            <OUTPUT: " a = b " />
+            <AFF: T, 8 + 9 />
+            <IF: AND(EGA(a,3),SUP(7,b)) >
+                            <THEN>
+                                    <OUTPUT: " a = b " />
+                                    <AFF: a, 8 + 9/>
+                                    <INPUT: idf  " #" />
+            <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
+                            
+                            </THEN>
+                            <ELSE>
+                                    <OUTPUT: "condition non verifiee" />
+                                    <OUTPUT: " a = b " />
+                                    <AFF:idf2, 8 + 9/>
+                                    <INPUT: idf  " #" />
+            <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
+                            </ELSE> 
+                    </IF>
+            <INPUT: idf  " #" />
+            <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
+                            
+    <WHILE :AND(EGA(x,3),SUP(7,b))/>
+    </DO>
