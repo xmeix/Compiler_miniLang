@@ -25,7 +25,7 @@
         </ARRAY> 
     </ SUB VARIABLE >
     <SUB CONSTANTE> 
-        <x = 10 />;
+        <x = 10 />; 
         <nom_constante_5 = "hello" />;
         <b = (-150.11) />;
         <nom_constante_11 = (+32767) />;
