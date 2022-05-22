@@ -13,36 +13,39 @@
             <nom_tableau4: 20/> 
         </ARRAY>  
         <G AS BOL /> ;
-        < T|U AS INT /> ;
+        < T | U AS INT /> ;
         < Y AS INT /> ;
         < F  AS INT /> ; 
          < A AS INT /> ; 
           < B AS INT /> ; 
          
-         <ARRAY AS INT > 
-            <nom_tableau5: 20/>  
-            <nom_tableau6: 20/> 
+         <ARRAY AS FLT > 
+            <T1: 20/>  
+            <T2: 20/> 
         </ARRAY> 
     </ SUB VARIABLE >
     <SUB CONSTANTE> 
-        <nom_constante_9 = 10 />;
+        <x = 10 />;
         <nom_constante_5 = "hello" />;
-        <nom_constante_10 = (-150.11) />;
+        <b = (-150.11) />;
         <nom_constante_11 = (+32767) />;
-        <nom_constante_1  AS INT />; 
-        <nom_constante_2  AS FLT />; 
+        <a  AS BOL />;   
         <nom_constante_7 = 'a' />;
-        <idf|idf2 AS INT /> ; 
+        <idf2 AS INT /> ; 
         <nom_constante_6 = 7.3 />;
         <const = FALSE />;
+         <idf = "string" />;
+         <nom_constante_2 = 100.01/>;    
     </SUB CONSTANTE>
-    
     <body>
-
-        <AFF: G, AND(TRUE,TRUE)/> 
+    <DO>
+       
+    
         
-
-     </body>
+                <AFF: T, 8 + 9/>
+        <WHILE :AND(EGA(x,3),SUP(7,b))/>
+        </DO>
+    </body>
 
 
      

@@ -9,7 +9,22 @@
          <OUTPUT: "hdsf & " + idf + " kjsdfksd "+ " fsnf # "+idf + "jkfskjfn"/>
          <OUTPUT: " kjsdfksd "+" jkfskjfn $ "+idf + " fsnf % "+idf />
          <OUTPUT: "hdsf & kndcs"+idf+"kjsdfksd"+" # "+idf+"jkfskjfn"/>
-
+         
+         <AFF: T1[0] , 0.235 />
+         <AFF: T1[1] , 0.252 />
+         <AFF: T1[2] , 0.254 />
+         <AFF: T1[3] , 0.257 />
+         <AFF: T1[4] , 0.259 />
+         <AFF: T1[5] , 0.285 />
+         <AFF: T1[6] , 0.25 />
+         <OUTPUT: "hdsf $ " + idf + " kjsdfksd "+ " fsnf # "+nom_constante_5 + "jkfskjfn"+ " fsnf % "+ T1[5] />
+         <OUTPUT: "hdsf $ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+ T1[5] />
+         
+         
+         <OUTPUT: "hdsf $ kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf % "+ T1[5] />
+        <OUTPUT: " kjsdfksd "+" jkfskjfn $ "+idf + " fsnf % "+T1[5] />
+         <OUTPUT: "hdsf & kndcs"+nom_constante_7+"kjsdfksd"+" # "+nom_constante_5+"jkfskjfn"/>
+     
     <IF: AND(EGA(a,3),SUP(7,b)) >
         <THEN>
                 <OUTPUT: " a = b " />

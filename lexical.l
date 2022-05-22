@@ -3,6 +3,7 @@
 	#include <stdlib.h>
 	#include <string.h>
 	#include "TS.h"
+	#include "quadruplets.h"
     #include "syntaxique.tab.h"
     extern nb_ligne;
 	extern Col;
@@ -10,6 +11,7 @@
     int i=1; 
 	int k;
 	extern YYSTYPE yylval;
+	extern FileName;
 	/*
 	A REVOIR : 
 	-PRBLM INPUT coté droit quand on enleve l'espace une erreur se prod " @"
@@ -17,7 +19,7 @@
 	*/
 %}
 Signe [!\'-\.\:-\?\[\{-\}]
-MESSAGE ({lettre}|{chiffre}|{Signe}|" "|"-")*
+MESSAGE ({lettre}|{chiffre}|{Signe}|" "|"-"|"_")*
 CHAINEGAUCHE ["]{MESSAGE}
 CHAINEDROITE {MESSAGE}["](" ")*(\/\>)
 CHAINE_OUTDR {MESSAGE}["](" ")*(\+)
@@ -27,7 +29,7 @@ chiffre [0-9]
 CST_UNSIGNED_INT [1-9]{chiffre}*|0
 CST_INT_POS [+][1-9]{chiffre}*
 CST_INT_NEG [-][1-9]{chiffre}*
-CST_FLOAT \([-+][1-9][0-9]{0,6}\.[0-9]{1,3}\)|\([-+]0\.[0-9]{1,3}\)|([1-9][0-9]{0,6}\.[0-9]{1,3}|0\.[0-9]{1,3})
+CST_FLOAT \([-+][1-9][0-9]{0,6}\.[0-9]{1,3}\)|\([-+]0\.[0-9]{1,3}\)|([1-9][0-9]{0,6}\.[0-9]{1,3}|[0]\.[0-9]{1,3})
 CST_BOOL ("TRUE"|"FALSE")
 CST_CHAR ['].?[']
 IDF {lettre}({lettre}|{chiffre}|_)* 
@@ -198,4 +200,8 @@ DIF { Col= Col+strlen(yytext); return dif;}
 	}
 [ \t] 
 \n {Col= 1; nb_ligne++;}
-. { printf("erreur lexical a la ligne %d colonne %d sur l'entite %s \n",nb_ligne,Col,yytext);}
+. { 
+	
+	printf("File \"%s\", line %d, character %d:lexical error\n",FileName,nb_ligne,Col);
+	//yyerror("lexical error a la ligne %d colonne %d sur l'entite %s \n",nb_ligne,Col,yytext);
+	}

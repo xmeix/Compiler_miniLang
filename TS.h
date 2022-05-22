@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string.h>  
 
 
 #define taille_table_hachage 5
@@ -143,22 +143,32 @@ void InsertionTab(char idf[],int position,char *valeur){
   element *p;
   int cle;
   char **temporary;
+  char val[100];
   cle = fonction_hachage(idf);
   for(p=table_hachage[cle];p!=NULL;p=p->suivant)
-    if(strcmp(p->name,idf)==0)
+    if(strcmp(p->name,idf)==0 )
     {
       temporary= (char**) malloc((p->taille)*sizeof(char*));
       memcpy(temporary, p->arrayTab,p->taille);
-      temporary[position]= valeur;
-
-
-      memcpy(p->arrayTab, temporary, p->taille);
-      memset(temporary, 0, p->taille);
-      memcpy(temporary, p->arrayTab,p->taille);
-      ///COPIE DANS TEMP POUR AFFICHER  
       
-      printf("Temporary[%d] = %s \n",position,temporary[position]);
+      if(temporary[position-1]=='\0' && position != 0 ){
+
+        printf("%d\n",position);
+        printf("ERREUR TABLEAU CONTIENTS DES VALEURS D'UNE POSITION PRECEDANTE EGALE A NULL \n");
+      
     
+      }else { 
+        printf("HERE\n");
+          temporary[position]=valeur; 
+          memcpy(p->arrayTab, temporary,p->taille);
+          
+          //POUR VERIFIER
+          memset(temporary, 0, p->taille);
+          memcpy(temporary, p->arrayTab,p->taille);
+          printf("%s[%d] = %s \n",idf,position,temporary[position]);
+          ///COPIE DANS TEMP POUR AFFICHER 
+       }
+
     }
 
 }
@@ -193,14 +203,14 @@ float getValueTab(char idf[],int position){
     float val;
     cle = fonction_hachage(idf);
     for(p=table_hachage[cle];p!=NULL;p=p->suivant)
-      if(strcmp(p->name,idf)==0 && (strcmp(p->type,"INT")==0 || strcmp(p->type,"FLOAT")==0))
+      if(strcmp(p->name,idf)==0 && (strcmp(p->type,"INT")==0 || strcmp(p->type,"FLT")==0))
       {
         temporary= (char**) malloc((p->taille)*sizeof(char*));
         memcpy(temporary, p->arrayTab,p->taille);
         val = atof(temporary[position]);
         return val;
 
-      }else if((strcmp(p->type,"INT")!=0 && strcmp(p->type,"FLOAT")!=0))
+      }else if((strcmp(p->type,"INT")!=0 && strcmp(p->type,"FLT")!=0))
             {
               printf("Erreur semantique: une expression arithmetique contient un idf Tableau %s de type STRING\n",idf);
               exit(0);
@@ -221,19 +231,19 @@ int getValueIdf(char idf[], char* res){
     for(p=table_hachage[cle];p!=NULL;p=p->suivant){
       if(strcmp(p->name,idf)==0)
       {
-        if(p->state==0){
-            printf("HERE\n");
+        if(strcmp(p->type,"INT")==0){
+            //printf("HERE\n");
             sprintf(res,"%f",(float)(p->val));
-            printf("res ========================= %s\n",res);
+            //printf("res ========================= %s\n",res);
             return 0;
-        }else if(p->state==1){
-            printf("HERE\n");
+        }else if(strcmp(p->type,"FLT")==0){
+            //printf("HERE\n");
             sprintf(res,"%f",p->valF);
-            printf("res ========================= %s\n",res);
+            //printf("res ========================= %s\n",res);
             return 0;
 
-        }else if(p->state==2){
-             printf("Erreur semantique: une expression arithmetique contient un idf %s de type STRING\n",idf);
+        }else if(strcmp(p->type,"STR")==0 || strcmp(p->type,"CHR")==0 || strcmp(p->type,"BOL")==0){
+             printf("Erreur semantique: une expression arithmetique contient un idf %s de type %s \n",idf,p->type);
             exit(0);
         }
   
@@ -243,12 +253,12 @@ int getValueIdf(char idf[], char* res){
     exit(0);
     
 }
+
 int verificationType(char entite[],int type){
 
   if(typeEntite(entite) == type){
     return 0;
-  }else {
-
+  }else { 
     printf("Erreur semantique : Incompatibilite de type de l'entite lexicale %s \n",entite);
     exit(0);
   }
@@ -444,10 +454,276 @@ int ValueIdfBol(char entite[]){
 
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+void fonctionInput(char entite[],int signe){
+    element *p;
+    int cle;
+      cle = fonction_hachage(entite);
+      for(p=table_hachage[cle];p!=NULL;p=p->suivant)
+        {
+          if(strcmp(p->name,entite)==0)
+            {
+              //VERIFICATIONType 
+              printf("signe = %d\n",signe);
+              switch(signe){
+    
+                  case 1:{ 
+
+                        if(strcmp(p->type,"INT")!=0){
+                            printf("Erreur semantique: Instruction INPUT Incorrect , Le type de la variable %s et le type du signe du formatage $ ne sont pas compatible \n");
+                            exit(0);
+                        }
+                        
+                        int variable ; scanf("%d",&variable); 
+                        printf("HERE \n"); 
+                        p->val = variable;
+                  }break;
+                  case 2:{
+                       if(strcmp(p->type,"FLT")!=0){
+                            printf("Erreur semantique: Instruction INPUT Incorrect , Le type de la variable %s et le type du signe du formatage modulo ne sont pas compatible \n");
+                            exit(0);
+                        }
+                        float variable ; scanf("%f",&variable);  
+                        p->valF = variable;
+
+                  }break;
+                  case 3:{
+                        if(strcmp(p->type,"STR")!=0){
+                            printf("Erreur semantique: Instruction INPUT Incorrect , Le type de la variable %s et le type du signe du formatage # ne sont pas compatible \n");
+                            exit(0);
+                        }
+                        char variable[100] ; 
+                        scanf("%s",variable);  
+                        strcpy(p->valStr,variable);
+                  }break;
+                  case 4:{
+                    
+                        if(strcmp(p->type,"BOL")!=0){
+                            printf("Erreur semantique: Instruction INPUT Incorrect , Le type de la variable %s et le type du signe du formatage @ ne sont pas compatible \n");
+                            exit(0);
+                        }
+                        printf("Instruction\n");
+                        char variable[6] ; scanf("%s",variable); 
+                        strcpy(p->valStr,variable); 
+                  }break;
+                  case 5:{
+                        if(strcmp(p->type,"CHR")!=0){
+                            printf("Erreur semantique: Instruction INPUT Incorrect , Le type de la variable %s et le type du signe du formatage & ne sont pas compatible \n");
+                            exit(0);
+                        }
+                        char variable[2] ; scanf("%s",variable);  
+                        strcpy(p->valStr,variable);
+                  }break;
+                  default: printf("ERROR: Unknown\n");
+
+              }
+
+            }
+        }
+
+  
+}
+
+void VerificationTypeINOUT(char entite[],int signe){
+    element *p;
+    int cle;
+      cle = fonction_hachage(entite);
+      for(p=table_hachage[cle];p!=NULL;p=p->suivant)
+        {
+          if(strcmp(p->name,entite)==0)
+            {
+              //VERIFICATIONType  
+              switch(signe){
+    
+                  case 1:{ 
+
+                        if(strcmp(p->type,"INT")!=0){
+                            printf("Erreur semantique: Instruction INPUT/OUTPUT Incorrect , Le type de la variable %s et le type du signe du formatage $ ne sont pas compatible \n");
+                            exit(0);
+                        }
+                  }break;
+                  case 2:{
+                       if(strcmp(p->type,"FLT")!=0){
+                            printf("Erreur semantique: Instruction INPUT/OUTPUT Incorrect , Le type de la variable %s et le type du signe du formatage modulo ne sont pas compatible \n");
+                            exit(0);
+                        }
+                         
+                  }break;
+                  case 3:{
+                        if(strcmp(p->type,"STR")!=0){
+                            printf("Erreur semantique: Instruction INPUT/OUTPUT Incorrect , Le type de la variable %s et le type du signe du formatage # ne sont pas compatible \n");
+                            exit(0);
+                        }
+                        
+                  }break;
+                  case 4:{
+                    
+                        if(strcmp(p->type,"BOL")!=0){
+                            printf("Erreur semantique: Instruction INPUT/OUTPUT Incorrect , Le type de la variable %s et le type du signe du formatage @ ne sont pas compatible \n");
+                            exit(0);
+                        }
+                        
+                  }break;
+                  case 5:{
+                        if(strcmp(p->type,"CHR")!=0){
+                            printf("Erreur semantique: Instruction INPUT/OUTPUT Incorrect , Le type de la variable %s et le type du signe du formatage & ne sont pas compatible \n");
+                            exit(0);
+                        }
+                        
+                  }break;
+                  default: printf("ERROR: Unknown\n");
+
+              }
+
+            }
+        }
+
+  
+}
+/////////////////////////////////////////////////////////////////////////
+char * fonctionOutput(int signe,char entite[],char chaine1[],char chaine2[]){
+ 
+      // //0 == "
+      //   //1 == "+        
+      //   extractChaine(chaine1,0);
+
+      // //   extractChaine(chaine2,1);
+       
+      //   chaine2[strlen(chaine2)-1]='\0';
+      //   chaine2[strlen(chaine2)-2]='\0'; 
+
+
+      VerificationTypeINOUT(entite,signe);
+      
+      //printf("%s %s %s",strncpy(chaine1,chaine1 + 1,strlen(chaine1)),res,strncpy(chaine2,chaine2,strlen(chaine2)));
+
+}
+int InverserChaine(char *str){
+  
+    char rev[100]; 
+    int t, i, j;
+    j = 0;
+    t = strlen(str);
+ 
+    rev[t] = '\0'; //le dernier caractère doit toujours être égale à '\0'.
+    for (i = t - 1; i >= 0; i--)
+    {
+      rev[j++] = str[i];
+    }
+    rev[i] = '\0';
+
+    strcpy(str,rev);
+    return 0;
+}
+
+AfficheInverseOutput(char * buffer){
+  
+  InverserChaine(buffer);  
+  printf("%s\n",buffer);
+  strncpy(buffer, "", sizeof(buffer)); 
+
+}
 
 
 
+int getValIdf(char idf[], char* res, int position){
+  
+    element *p;
+    int cle;  
+    char **temporary;
+    char * val;
+    cle = fonction_hachage(idf);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant){
+      if(strcmp(p->name,idf)==0)
+      {
 
+        if(strcmp(p->categorie,"tableau")!=0){
+          
+          printf("C est une variable\n");
+          if(strcmp(p->type,"INT")==0){
+              
+              sprintf(res,"%d",p->val);
+              return 0;
+          }else if(strcmp(p->type,"FLT")==0){
+              sprintf(res,"%f",p->valF);
+              return 0;
+
+          }else if(strcmp(p->type,"STR")==0 || strcmp(p->type,"CHR")==0 || strcmp(p->type,"BOL")==0){
+              strcpy(res,p->valStr);
+              return 0;
+          }
+        }else if(strcmp(p->categorie,"tableau")==0) {
+          
+          printf("C est un tableau %s\n",idf);
+          temporary= (char**) malloc((p->taille)*sizeof(char*));
+            
+          memcpy(temporary, p->arrayTab,p->taille);
+          ///COPIE DANS TEMP POUR AFFICHER  
+          int j;
+          for ( j = 0; j <p->taille; j++)
+          {
+            printf("%s[%d] = %s \n",idf,j,temporary[j]);
+          }
+            
+          printf("%s[%d] = %s \n",idf,position,temporary[position]);
+
+          return 0;
+        }
+  
+      }
+    }  
+}
+
+
+
+/*
+element *p;
+    int cle;
+    char **temporary;
+    float val;
+    cle = fonction_hachage(idf);
+    for(p=table_hachage[cle];p!=NULL;p=p->suivant)
+      if(strcmp(p->name,idf)==0 && (strcmp(p->type,"INT")==0 || strcmp(p->type,"FLT")==0))
+      {
+        temporary= (char**) malloc((p->taille)*sizeof(char*));
+        memcpy(temporary, p->arrayTab,p->taille);
+        val = atof(temporary[position]);
+        return val;
+
+      }else if((strcmp(p->type,"INT")!=0 && strcmp(p->type,"FLT")!=0))
+            {
+              printf("Erreur semantique: une expression arithmetique contient un idf Tableau %s de type STRING\n",idf);
+              exit(0);
+            }
+
+*/
+
+/////////////////////////////////////////////////////////////////////////
+/*
+
+switch(signe){
+    
+    case 1:{ 
+          int variable ; scanf("%d",variable);  
+          
+    }break;
+    case 2:{
+          float variable ; scanf("%f",variable);  
+    }break;
+    case 3:{
+          char variable[100] ; scanf("%s",variable);  
+    }break;
+    case 4:{
+          int variable ; scanf("%d",variable);  
+    }break;
+    case 5:{
+          char variable ; scanf("%c",variable);  
+    }break;
+
+  }
+
+
+*/
 
 
 

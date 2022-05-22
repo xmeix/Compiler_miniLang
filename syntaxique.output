@@ -59,117 +59,135 @@ Grammaire
 
    33 BODY: AFFECTATION BODY
    34     | INPUT BODY
-   35     | bal_ouv mc_output deuxpt OUTPUT BODY
-   36     | INST_IF BODY
-   37     | BOUCLE_DO BODY
-   38     | BOUCLE_FOR BODY
-   39     | bal_slch_ouv mc_body bal_fer
 
-   40 AFFECTATION: bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer
-   41            | bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+   35 $@3: /* vide */
 
-   42 X: EXPRESSION_ARITH
-   43  | EXPRESSION_COMPARAISON
-   44  | EXPRESSION_LOGIQUE
-   45  | simple_string
-   46  | cst_char
-   47  | cst_bool
+   36 BODY: bal_ouv mc_output deuxpt OUTPUT $@3 BODY
+   37     | INST_IF BODY
+   38     | BOUCLE_DO BODY
+   39     | BOUCLE_FOR BODY
+   40     | bal_slch_ouv mc_body bal_fer
 
-   48 EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer
-   49                 | EXPRESSION_ARITH plus EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH moins EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH divis EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH mult EXPRESSION_ARITH
-   53                 | TERM
+   41 AFFECTATION: bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer
+   42            | bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
 
-   54 TERM: par_ouv cst_int_neg par_fer
-   55     | cst_unsigned_int
-   56     | cst_float
-   57     | idf
-   58     | idf cr_ouv cst_unsigned_int cr_fer
+   43 X: EXPRESSION_ARITH
+   44  | EXPRESSION_COMPARAISON
+   45  | EXPRESSION_LOGIQUE
+   46  | simple_string
+   47  | cst_char
+   48  | cst_bool
 
-   59 $@3: /* vide */
+   49 EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer
+   50                 | EXPRESSION_ARITH plus EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH moins EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH divis EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH mult EXPRESSION_ARITH
+   54                 | TERM
 
-   60 EXPRESSION_LOGIQUE: and par_ouv $@3 EXPRESSIONS par_fer
+   55 TERM: par_ouv cst_int_neg par_fer
+   56     | cst_unsigned_int
+   57     | cst_float
+   58     | idf
+   59     | idf cr_ouv cst_unsigned_int cr_fer
 
-   61 $@4: /* vide */
+   60 EXPRESSION_LOGIQUE: OpLog par_ouv EXPRESSIONS par_fer
+   61                   | not par_ouv TYPE_EXP par_fer
 
-   62 EXPRESSION_LOGIQUE: or par_ouv $@4 EXPRESSIONS par_fer
+   62 OpLog: and
+   63      | or
 
-   63 $@5: /* vide */
+   64 EXPRESSIONS: TYPE_EXP vrg EXPRESSIONS
+   65            | TYPE_EXP vrg TYPE_EXP
 
-   64 EXPRESSION_LOGIQUE: not par_ouv $@5 TYPE_EXP par_fer
+   66 TYPE_EXP: EXPRESSION_LOGIQUE
+   67         | EXPRESSION_COMPARAISON
+   68         | cst_bool
+   69         | idf
+   70         | idf cr_ouv cst_unsigned_int cr_fer
 
-   65 EXPRESSIONS: TYPE_EXP vrg EXPRESSIONS
-   66            | TYPE_EXP vrg TYPE_EXP
+   71 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer
 
-   67 TYPE_EXP: EXPRESSION_LOGIQUE
-   68         | EXPRESSION_COMPARAISON
-   69         | cst_bool
-   70         | idf
-   71         | idf cr_ouv cst_unsigned_int cr_fer
+   72 MC_COMPARAISON: sup
+   73               | supeg
+   74               | infeg
+   75               | inf
+   76               | ega
+   77               | dif
 
-   72 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer
+   78 INPUT: bal_ouv mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
 
-   73 MC_COMPARAISON: sup
-   74               | supeg
-   75               | infeg
-   76               | inf
-   77               | ega
-   78               | dif
+   79 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr ID plus OUTPUT
+   80       | simple_string plus OUTPUT
+   81       | chaine_gauche SIGNE_FORMATAGE chaine_outdr ID bal_slch_fer
+   82       | simple_string bal_slch_fer
 
-   79 INPUT: bal_ouv mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
+   83 ID: idf
+   84   | idf cr_ouv cst_unsigned_int cr_fer
 
-   80 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr idf plus OUTPUT
-   81       | simple_string plus OUTPUT
-   82       | chaine_gauche SIGNE_FORMATAGE chaine_outdr idf bal_slch_fer
-   83       | simple_string bal_slch_fer
+   85 SIGNE_FORMATAGE: dollar
+   86                | mod
+   87                | hash
+   88                | arob
+   89                | etcom
 
-   84 SIGNE_FORMATAGE: dollar
-   85                | mod
-   86                | hash
-   87                | arob
-   88                | etcom
+   90 INSTRUCTION: AFFECTATION INSTRUCTION
+   91            | INPUT INSTRUCTION
 
-   89 INSTRUCTION: AFFECTATION INSTRUCTION
-   90            | INPUT INSTRUCTION
-   91            | bal_ouv mc_output deuxpt OUTPUT INSTRUCTION
-   92            | /* vide */
+   92 $@4: /* vide */
 
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
+   93 INSTRUCTION: bal_ouv mc_output deuxpt OUTPUT $@4 INSTRUCTION
+   94            | /* vide */
 
-   95 CONDITION: EXPRESSION_LOGIQUE
-   96          | EXPRESSION_COMPARAISON
+   95 IF_A: bal_ouv mc_if deuxpt CONDITION
 
-   97 INST_ELSE: bal_ouv mc_else bal_fer INSTRUCTION_ELSE
+   96 IF_B: IF_A bal_fer bal_ouv mc_then bal_fer INSTRUCTION
 
-   98 INSTRUCTION_ELSE: AFFECTATION INSTRUCTION_ELSE
-   99                 | INPUT INSTRUCTION_ELSE
-  100                 | bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_ELSE
-  101                 | INST_IF INSTRUCTION_ELSE
-  102                 | bal_slch_ouv mc_else bal_fer
+   97 IF_C: IF_B bal_slch_ouv mc_then bal_fer INST_ELSE
+   98     | IF_B bal_slch_ouv mc_then bal_fer
 
-  103 BOUCLE_DO: bal_ouv mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv mc_do bal_fer
+   99 INST_IF: IF_C bal_slch_ouv mc_if bal_fer
 
-  104 INSTRUCTION_BOUCLE_DO: AFFECTATION INSTRUCTION_BOUCLE_DO
-  105                      | INPUT INSTRUCTION_BOUCLE_DO
-  106                      | bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_DO
-  107                      | INST_IF INSTRUCTION_BOUCLE_DO
-  108                      | BOUCLE_DO INSTRUCTION_BOUCLE_DO
-  109                      | BOUCLE_FOR INSTRUCTION_BOUCLE_DO
-  110                      | bal_ouv mc_while deuxpt
+  100 CONDITION: EXPRESSION_LOGIQUE
+  101          | EXPRESSION_COMPARAISON
 
-  111 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
+  102 INST_ELSE: bal_ouv mc_else bal_fer INSTRUCTION_ELSE
 
-  113 INSTRUCTION_BOUCLE_FOR: AFFECTATION INSTRUCTION_BOUCLE_FOR
-  114                       | INPUT INSTRUCTION_BOUCLE_FOR
-  115                       | bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR
-  116                       | INST_IF INSTRUCTION_BOUCLE_FOR
-  117                       | BOUCLE_DO INSTRUCTION_BOUCLE_FOR
-  118                       | BOUCLE_FOR INSTRUCTION_BOUCLE_FOR
-  119                       | bal_slch_ouv mc_for bal_fer
+  103 INSTRUCTION_ELSE: AFFECTATION INSTRUCTION_ELSE
+  104                 | INPUT INSTRUCTION_ELSE
+
+  105 $@5: /* vide */
+
+  106 INSTRUCTION_ELSE: bal_ouv mc_output deuxpt OUTPUT $@5 INSTRUCTION_ELSE
+  107                 | INST_IF INSTRUCTION_ELSE
+  108                 | bal_slch_ouv mc_else bal_fer
+
+  109 BOUCLE_DO_A: bal_ouv mc_do bal_fer
+
+  110 BOUCLE_DO_B: BOUCLE_DO_A INSTRUCTION_BOUCLE_DO
+
+  111 BOUCLE_DO_C: BOUCLE_DO_B CONDITION
+
+  112 BOUCLE_DO: BOUCLE_DO_C bal_slch_fer bal_slch_ouv mc_do bal_fer
+
+  113 INSTRUCTION_BOUCLE_DO: AFFECTATION INSTRUCTION_BOUCLE_DO
+  114                      | INPUT INSTRUCTION_BOUCLE_DO
+  115                      | bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_DO
+  116                      | INST_IF INSTRUCTION_BOUCLE_DO
+  117                      | BOUCLE_DO INSTRUCTION_BOUCLE_DO
+  118                      | BOUCLE_FOR INSTRUCTION_BOUCLE_DO
+  119                      | bal_ouv mc_while deuxpt
+
+  120 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
+
+  122 INSTRUCTION_BOUCLE_FOR: AFFECTATION INSTRUCTION_BOUCLE_FOR
+  123                       | INPUT INSTRUCTION_BOUCLE_FOR
+  124                       | bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR
+  125                       | INST_IF INSTRUCTION_BOUCLE_FOR
+  126                       | BOUCLE_DO INSTRUCTION_BOUCLE_FOR
+  127                       | BOUCLE_FOR INSTRUCTION_BOUCLE_FOR
+  128                       | bal_slch_ouv mc_for bal_fer
 
 
 Terminaux, suivis des règles où ils apparaissent
@@ -180,68 +198,69 @@ mc_exl (258) 1
 mc_docprogram (259) 1
 mc_sub (260) 2 3 4 8 10 13
 mc_variable (261) 2 3 4 8
-mc_body (262) 1 39
-bal_ouv (263) 1 2 3 4 6 7 10 11 12 31 35 40 41 79 91 93 94 97 100 103
-    106 110 111 112 115
-bal_fer (264) 1 2 3 4 7 8 10 13 32 39 93 94 97 102 103 111 112 119
-bal_slch_fer (265) 14 24 31 40 41 82 83 103
-bal_slch_ouv (266) 1 8 13 32 39 93 94 102 103 119
-idf (267) 1 14 23 24 31 40 41 57 58 70 71 79 80 82 111 112
+mc_body (262) 1 40
+bal_ouv (263) 1 2 3 4 6 7 10 11 12 31 36 41 42 78 93 95 96 102 106
+    109 115 119 120 121 124
+bal_fer (264) 1 2 3 4 7 8 10 13 32 40 96 97 98 99 102 108 109 112 120
+    121 128
+bal_slch_fer (265) 14 24 31 41 42 81 82 112
+bal_slch_ouv (266) 1 8 13 32 40 97 98 99 108 112 128
+idf (267) 1 14 23 24 31 41 42 58 59 69 70 78 83 84 120 121
 mc_as (268) 7 24
 pvg (269) 14 24
 ou (270) 23
 mc_array (271) 7 32
-deuxpt (272) 31 35 40 41 79 91 93 94 100 106 110 115
+deuxpt (272) 31 36 41 42 78 93 95 106 115 119 124
 mc_constante (273) 10 13
-egal (274) 14 111 112
-par_ouv (275) 20 21 48 54 60 62 64 72
-par_fer (276) 20 21 48 54 60 62 64 72
-cr_ouv (277) 41 58 71
-cr_fer (278) 41 58 71
-cst_unsigned_int (279) 22 31 41 55 58 71
+egal (274) 14 120 121
+par_ouv (275) 20 21 49 55 60 61 71
+par_fer (276) 20 21 49 55 60 61 71
+cr_ouv (277) 42 59 70 84
+cr_fer (278) 42 59 70 84
+cst_unsigned_int (279) 22 31 42 56 59 70 84
 cst_int_pos (280) 20
-cst_int_neg (281) 21 54
-cst_float (282) 16 56
-cst_bool (283) 17 47 69
-cst_char (284) 18 46
-plus (285) 49 80 81
-moins (286) 50
-mult (287) 52
-divis (288) 51
-and (289) 60
-or (290) 62
-not (291) 64
-sup (292) 73
-inf (293) 76
-supeg (294) 74
-infeg (295) 75
-ega (296) 77
-dif (297) 78
+cst_int_neg (281) 21 55
+cst_float (282) 16 57
+cst_bool (283) 17 48 68
+cst_char (284) 18 47
+plus (285) 50 79 80
+moins (286) 51
+mult (287) 53
+divis (288) 52
+and (289) 62
+or (290) 63
+not (291) 61
+sup (292) 72
+inf (293) 75
+supeg (294) 73
+infeg (295) 74
+ega (296) 76
+dif (297) 77
 mc_int (298) 25
 mc_float (299) 26
 mc_char (300) 27
 mc_string (301) 28
 mc_bool (302) 29
-mc_aff (303) 40 41
-vrg (304) 40 41 65 66 72
-mc_input (305) 79
-mc_output (306) 35 91 100 106 115
-dollar (307) 84
-mod (308) 85
-hash (309) 86
-arob (310) 87
-etcom (311) 88
-chaine_gauche (312) 79 80 82
-chaine_droite (313) 79
-chaine_outdr (314) 80 82
-simple_string (315) 19 45 81 83
-mc_if (316) 93 94
-mc_then (317) 93 94
-mc_else (318) 97 102
-mc_do (319) 103
-mc_while (320) 110
-mc_for (321) 111 112 119
-mc_until (322) 111 112
+mc_aff (303) 41 42
+vrg (304) 41 42 64 65 71
+mc_input (305) 78
+mc_output (306) 36 93 106 115 124
+dollar (307) 85
+mod (308) 86
+hash (309) 87
+arob (310) 88
+etcom (311) 89
+chaine_gauche (312) 78 79 81
+chaine_droite (313) 78
+chaine_outdr (314) 79 81
+simple_string (315) 19 46 80 82
+mc_if (316) 95 99
+mc_then (317) 96 97 98
+mc_else (318) 102 108
+mc_do (319) 109 112
+mc_while (320) 119
+mc_for (321) 120 121 128
+mc_until (322) 120 121
 
 
 Non-terminaux, suivis des règles où ils apparaissent
@@ -265,7 +284,7 @@ DEC_CONST_EGAL (75)
 SWITCH_CST_TYPES (76)
     à gauche: 15 16 17 18 19, à droite: 14
 SWITCH_INT (77)
-    à gauche: 20 21 22, à droite: 15 111 112
+    à gauche: 20 21 22, à droite: 15 120 121
 DECLARATION_SIMPLE (78)
     à gauche: 23 24, à droite: 6 11 23
 TYPE (79)
@@ -275,57 +294,73 @@ DECLARATION_TAB (80)
 $@2 (81)
     à gauche: 30, à droite: 31
 BODY (82)
-    à gauche: 33 34 35 36 37 38 39, à droite: 1 33 34 35 36 37 38
-AFFECTATION (83)
-    à gauche: 40 41, à droite: 33 89 98 104 113
-X (84)
-    à gauche: 42 43 44 45 46 47, à droite: 40 41
-EXPRESSION_ARITH (85)
-    à gauche: 48 49 50 51 52 53, à droite: 42 48 49 50 51 52 72
-TERM (86)
-    à gauche: 54 55 56 57 58, à droite: 53
-EXPRESSION_LOGIQUE (87)
-    à gauche: 60 62 64, à droite: 44 67 95
-$@3 (88)
-    à gauche: 59, à droite: 60
-$@4 (89)
-    à gauche: 61, à droite: 62
-$@5 (90)
-    à gauche: 63, à droite: 64
-EXPRESSIONS (91)
-    à gauche: 65 66, à droite: 60 62 65
-TYPE_EXP (92)
-    à gauche: 67 68 69 70 71, à droite: 64 65 66
-EXPRESSION_COMPARAISON (93)
-    à gauche: 72, à droite: 43 68 96
-MC_COMPARAISON (94)
-    à gauche: 73 74 75 76 77 78, à droite: 72
-INPUT (95)
-    à gauche: 79, à droite: 34 90 99 105 114
-OUTPUT (96)
-    à gauche: 80 81 82 83, à droite: 35 80 81 91 100 106 115
+    à gauche: 33 34 36 37 38 39 40, à droite: 1 33 34 36 37 38 39
+$@3 (83)
+    à gauche: 35, à droite: 36
+AFFECTATION (84)
+    à gauche: 41 42, à droite: 33 90 103 113 122
+X (85)
+    à gauche: 43 44 45 46 47 48, à droite: 41 42
+EXPRESSION_ARITH (86)
+    à gauche: 49 50 51 52 53 54, à droite: 43 49 50 51 52 53 71
+TERM (87)
+    à gauche: 55 56 57 58 59, à droite: 54
+EXPRESSION_LOGIQUE (88)
+    à gauche: 60 61, à droite: 45 66 100
+OpLog (89)
+    à gauche: 62 63, à droite: 60
+EXPRESSIONS (90)
+    à gauche: 64 65, à droite: 60 64
+TYPE_EXP (91)
+    à gauche: 66 67 68 69 70, à droite: 61 64 65
+EXPRESSION_COMPARAISON (92)
+    à gauche: 71, à droite: 44 67 101
+MC_COMPARAISON (93)
+    à gauche: 72 73 74 75 76 77, à droite: 71
+INPUT (94)
+    à gauche: 78, à droite: 34 91 104 114 123
+OUTPUT (95)
+    à gauche: 79 80 81 82, à droite: 36 79 80 93 106 115 124
+ID (96)
+    à gauche: 83 84, à droite: 79 81
 SIGNE_FORMATAGE (97)
-    à gauche: 84 85 86 87 88, à droite: 79 80 82
+    à gauche: 85 86 87 88 89, à droite: 78 79 81
 INSTRUCTION (98)
-    à gauche: 89 90 91 92, à droite: 89 90 91 93 94
-INST_IF (99)
-    à gauche: 93 94, à droite: 36 101 107 116
-CONDITION (100)
-    à gauche: 95 96, à droite: 93 94 103
-INST_ELSE (101)
-    à gauche: 97, à droite: 93
-INSTRUCTION_ELSE (102)
-    à gauche: 98 99 100 101 102, à droite: 97 98 99 100 101
-BOUCLE_DO (103)
-    à gauche: 103, à droite: 37 108 117
-INSTRUCTION_BOUCLE_DO (104)
-    à gauche: 104 105 106 107 108 109 110, à droite: 103 104 105 106
-    107 108 109
-BOUCLE_FOR (105)
-    à gauche: 111 112, à droite: 38 109 118
-INSTRUCTION_BOUCLE_FOR (106)
-    à gauche: 113 114 115 116 117 118 119, à droite: 111 112 113 114
-    115 116 117 118
+    à gauche: 90 91 93 94, à droite: 90 91 93 96
+$@4 (99)
+    à gauche: 92, à droite: 93
+IF_A (100)
+    à gauche: 95, à droite: 96
+IF_B (101)
+    à gauche: 96, à droite: 97 98
+IF_C (102)
+    à gauche: 97 98, à droite: 99
+INST_IF (103)
+    à gauche: 99, à droite: 37 107 116 125
+CONDITION (104)
+    à gauche: 100 101, à droite: 95 111
+INST_ELSE (105)
+    à gauche: 102, à droite: 97
+INSTRUCTION_ELSE (106)
+    à gauche: 103 104 106 107 108, à droite: 102 103 104 106 107
+$@5 (107)
+    à gauche: 105, à droite: 106
+BOUCLE_DO_A (108)
+    à gauche: 109, à droite: 110
+BOUCLE_DO_B (109)
+    à gauche: 110, à droite: 111
+BOUCLE_DO_C (110)
+    à gauche: 111, à droite: 112
+BOUCLE_DO (111)
+    à gauche: 112, à droite: 38 117 126
+INSTRUCTION_BOUCLE_DO (112)
+    à gauche: 113 114 115 116 117 118 119, à droite: 110 113 114 115
+    116 117 118
+BOUCLE_FOR (113)
+    à gauche: 120 121, à droite: 39 118 127
+INSTRUCTION_BOUCLE_FOR (114)
+    à gauche: 122 123 124 125 126 127 128, à droite: 120 121 122 123
+    124 125 126 127
 
 
 état 0
@@ -498,16 +533,22 @@ INSTRUCTION_BOUCLE_FOR (106)
     BODY         aller à l'état 28
     AFFECTATION  aller à l'état 29
     INPUT        aller à l'état 30
-    INST_IF      aller à l'état 31
-    BOUCLE_DO    aller à l'état 32
-    BOUCLE_FOR   aller à l'état 33
+    IF_A         aller à l'état 31
+    IF_B         aller à l'état 32
+    IF_C         aller à l'état 33
+    INST_IF      aller à l'état 34
+    BOUCLE_DO_A  aller à l'état 35
+    BOUCLE_DO_B  aller à l'état 36
+    BOUCLE_DO_C  aller à l'état 37
+    BOUCLE_DO    aller à l'état 38
+    BOUCLE_FOR   aller à l'état 39
 
 
 état 21
 
     3 DEC_TOTAL: DECLARATION_CONST bal_ouv mc_sub mc_variable . bal_fer DECLARATION
 
-    bal_fer  décalage et aller à l'état 34
+    bal_fer  décalage et aller à l'état 40
 
 
 état 22
@@ -515,17 +556,17 @@ INSTRUCTION_BOUCLE_FOR (106)
     6 DECLARATION: bal_ouv . DECLARATION_SIMPLE DECLARATION
     7            | bal_ouv . mc_array mc_as TYPE bal_fer DECLARATION_TAB DECLARATION
 
-    idf       décalage et aller à l'état 35
-    mc_array  décalage et aller à l'état 36
+    idf       décalage et aller à l'état 41
+    mc_array  décalage et aller à l'état 42
 
-    DECLARATION_SIMPLE  aller à l'état 37
+    DECLARATION_SIMPLE  aller à l'état 43
 
 
 état 23
 
     8 DECLARATION: bal_slch_ouv . mc_sub mc_variable bal_fer
 
-    mc_sub  décalage et aller à l'état 38
+    mc_sub  décalage et aller à l'état 44
 
 
 état 24
@@ -533,55 +574,54 @@ INSTRUCTION_BOUCLE_FOR (106)
     2 DEC_TOTAL: bal_ouv mc_sub mc_variable bal_fer DECLARATION . DECLARATION_CONST
     4          | bal_ouv mc_sub mc_variable bal_fer DECLARATION .
 
-    bal_ouv  décalage et aller à l'état 39
+    bal_ouv  décalage et aller à l'état 45
 
     bal_ouv  [réduction par utilisation de la règle 4 (DEC_TOTAL)]
 
-    DECLARATION_CONST  aller à l'état 40
+    DECLARATION_CONST  aller à l'état 46
 
 
 état 25
 
    10 DECLARATION_CONST: bal_ouv mc_sub mc_constante bal_fer $@1 . LISTE_DEC_CONST
 
-    bal_ouv       décalage et aller à l'état 41
-    bal_slch_ouv  décalage et aller à l'état 42
+    bal_ouv       décalage et aller à l'état 47
+    bal_slch_ouv  décalage et aller à l'état 48
 
-    LISTE_DEC_CONST  aller à l'état 43
+    LISTE_DEC_CONST  aller à l'état 49
 
 
 état 26
 
-   35 BODY: bal_ouv . mc_output deuxpt OUTPUT BODY
-   40 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
-   41            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
-   79 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
-   93 INST_IF: bal_ouv . mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv . mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
-  103 BOUCLE_DO: bal_ouv . mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv mc_do bal_fer
-  111 BOUCLE_FOR: bal_ouv . mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv . mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
+   36 BODY: bal_ouv . mc_output deuxpt OUTPUT $@3 BODY
+   41 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
+   42            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+   78 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
+   95 IF_A: bal_ouv . mc_if deuxpt CONDITION
+  109 BOUCLE_DO_A: bal_ouv . mc_do bal_fer
+  120 BOUCLE_FOR: bal_ouv . mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv . mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
 
-    mc_aff     décalage et aller à l'état 44
-    mc_input   décalage et aller à l'état 45
-    mc_output  décalage et aller à l'état 46
-    mc_if      décalage et aller à l'état 47
-    mc_do      décalage et aller à l'état 48
-    mc_for     décalage et aller à l'état 49
+    mc_aff     décalage et aller à l'état 50
+    mc_input   décalage et aller à l'état 51
+    mc_output  décalage et aller à l'état 52
+    mc_if      décalage et aller à l'état 53
+    mc_do      décalage et aller à l'état 54
+    mc_for     décalage et aller à l'état 55
 
 
 état 27
 
-   39 BODY: bal_slch_ouv . mc_body bal_fer
+   40 BODY: bal_slch_ouv . mc_body bal_fer
 
-    mc_body  décalage et aller à l'état 50
+    mc_body  décalage et aller à l'état 56
 
 
 état 28
 
     1 S: bal_ouv mc_exl mc_docprogram idf bal_fer DEC_TOTAL bal_ouv mc_body bal_fer BODY . bal_slch_ouv mc_docprogram bal_fer
 
-    bal_slch_ouv  décalage et aller à l'état 51
+    bal_slch_ouv  décalage et aller à l'état 57
 
 
 état 29
@@ -591,12 +631,18 @@ INSTRUCTION_BOUCLE_FOR (106)
     bal_ouv       décalage et aller à l'état 26
     bal_slch_ouv  décalage et aller à l'état 27
 
-    BODY         aller à l'état 52
+    BODY         aller à l'état 58
     AFFECTATION  aller à l'état 29
     INPUT        aller à l'état 30
-    INST_IF      aller à l'état 31
-    BOUCLE_DO    aller à l'état 32
-    BOUCLE_FOR   aller à l'état 33
+    IF_A         aller à l'état 31
+    IF_B         aller à l'état 32
+    IF_C         aller à l'état 33
+    INST_IF      aller à l'état 34
+    BOUCLE_DO_A  aller à l'état 35
+    BOUCLE_DO_B  aller à l'état 36
+    BOUCLE_DO_C  aller à l'état 37
+    BOUCLE_DO    aller à l'état 38
+    BOUCLE_FOR   aller à l'état 39
 
 
 état 30
@@ -606,1769 +652,1920 @@ INSTRUCTION_BOUCLE_FOR (106)
     bal_ouv       décalage et aller à l'état 26
     bal_slch_ouv  décalage et aller à l'état 27
 
-    BODY         aller à l'état 53
+    BODY         aller à l'état 59
     AFFECTATION  aller à l'état 29
     INPUT        aller à l'état 30
-    INST_IF      aller à l'état 31
-    BOUCLE_DO    aller à l'état 32
-    BOUCLE_FOR   aller à l'état 33
+    IF_A         aller à l'état 31
+    IF_B         aller à l'état 32
+    IF_C         aller à l'état 33
+    INST_IF      aller à l'état 34
+    BOUCLE_DO_A  aller à l'état 35
+    BOUCLE_DO_B  aller à l'état 36
+    BOUCLE_DO_C  aller à l'état 37
+    BOUCLE_DO    aller à l'état 38
+    BOUCLE_FOR   aller à l'état 39
 
 
 état 31
 
-   36 BODY: INST_IF . BODY
+   96 IF_B: IF_A . bal_fer bal_ouv mc_then bal_fer INSTRUCTION
 
-    bal_ouv       décalage et aller à l'état 26
-    bal_slch_ouv  décalage et aller à l'état 27
-
-    BODY         aller à l'état 54
-    AFFECTATION  aller à l'état 29
-    INPUT        aller à l'état 30
-    INST_IF      aller à l'état 31
-    BOUCLE_DO    aller à l'état 32
-    BOUCLE_FOR   aller à l'état 33
+    bal_fer  décalage et aller à l'état 60
 
 
 état 32
 
-   37 BODY: BOUCLE_DO . BODY
+   97 IF_C: IF_B . bal_slch_ouv mc_then bal_fer INST_ELSE
+   98     | IF_B . bal_slch_ouv mc_then bal_fer
 
-    bal_ouv       décalage et aller à l'état 26
-    bal_slch_ouv  décalage et aller à l'état 27
-
-    BODY         aller à l'état 55
-    AFFECTATION  aller à l'état 29
-    INPUT        aller à l'état 30
-    INST_IF      aller à l'état 31
-    BOUCLE_DO    aller à l'état 32
-    BOUCLE_FOR   aller à l'état 33
+    bal_slch_ouv  décalage et aller à l'état 61
 
 
 état 33
 
-   38 BODY: BOUCLE_FOR . BODY
+   99 INST_IF: IF_C . bal_slch_ouv mc_if bal_fer
+
+    bal_slch_ouv  décalage et aller à l'état 62
+
+
+état 34
+
+   37 BODY: INST_IF . BODY
 
     bal_ouv       décalage et aller à l'état 26
     bal_slch_ouv  décalage et aller à l'état 27
 
-    BODY         aller à l'état 56
+    BODY         aller à l'état 63
     AFFECTATION  aller à l'état 29
     INPUT        aller à l'état 30
-    INST_IF      aller à l'état 31
-    BOUCLE_DO    aller à l'état 32
-    BOUCLE_FOR   aller à l'état 33
+    IF_A         aller à l'état 31
+    IF_B         aller à l'état 32
+    IF_C         aller à l'état 33
+    INST_IF      aller à l'état 34
+    BOUCLE_DO_A  aller à l'état 35
+    BOUCLE_DO_B  aller à l'état 36
+    BOUCLE_DO_C  aller à l'état 37
+    BOUCLE_DO    aller à l'état 38
+    BOUCLE_FOR   aller à l'état 39
 
 
-état 34
+état 35
+
+  110 BOUCLE_DO_B: BOUCLE_DO_A . INSTRUCTION_BOUCLE_DO
+
+    bal_ouv  décalage et aller à l'état 64
+
+    AFFECTATION            aller à l'état 65
+    INPUT                  aller à l'état 66
+    IF_A                   aller à l'état 31
+    IF_B                   aller à l'état 32
+    IF_C                   aller à l'état 33
+    INST_IF                aller à l'état 67
+    BOUCLE_DO_A            aller à l'état 35
+    BOUCLE_DO_B            aller à l'état 36
+    BOUCLE_DO_C            aller à l'état 37
+    BOUCLE_DO              aller à l'état 68
+    INSTRUCTION_BOUCLE_DO  aller à l'état 69
+    BOUCLE_FOR             aller à l'état 70
+
+
+état 36
+
+  111 BOUCLE_DO_C: BOUCLE_DO_B . CONDITION
+
+    and    décalage et aller à l'état 71
+    or     décalage et aller à l'état 72
+    not    décalage et aller à l'état 73
+    sup    décalage et aller à l'état 74
+    inf    décalage et aller à l'état 75
+    supeg  décalage et aller à l'état 76
+    infeg  décalage et aller à l'état 77
+    ega    décalage et aller à l'état 78
+    dif    décalage et aller à l'état 79
+
+    EXPRESSION_LOGIQUE      aller à l'état 80
+    OpLog                   aller à l'état 81
+    EXPRESSION_COMPARAISON  aller à l'état 82
+    MC_COMPARAISON          aller à l'état 83
+    CONDITION               aller à l'état 84
+
+
+état 37
+
+  112 BOUCLE_DO: BOUCLE_DO_C . bal_slch_fer bal_slch_ouv mc_do bal_fer
+
+    bal_slch_fer  décalage et aller à l'état 85
+
+
+état 38
+
+   38 BODY: BOUCLE_DO . BODY
+
+    bal_ouv       décalage et aller à l'état 26
+    bal_slch_ouv  décalage et aller à l'état 27
+
+    BODY         aller à l'état 86
+    AFFECTATION  aller à l'état 29
+    INPUT        aller à l'état 30
+    IF_A         aller à l'état 31
+    IF_B         aller à l'état 32
+    IF_C         aller à l'état 33
+    INST_IF      aller à l'état 34
+    BOUCLE_DO_A  aller à l'état 35
+    BOUCLE_DO_B  aller à l'état 36
+    BOUCLE_DO_C  aller à l'état 37
+    BOUCLE_DO    aller à l'état 38
+    BOUCLE_FOR   aller à l'état 39
+
+
+état 39
+
+   39 BODY: BOUCLE_FOR . BODY
+
+    bal_ouv       décalage et aller à l'état 26
+    bal_slch_ouv  décalage et aller à l'état 27
+
+    BODY         aller à l'état 87
+    AFFECTATION  aller à l'état 29
+    INPUT        aller à l'état 30
+    IF_A         aller à l'état 31
+    IF_B         aller à l'état 32
+    IF_C         aller à l'état 33
+    INST_IF      aller à l'état 34
+    BOUCLE_DO_A  aller à l'état 35
+    BOUCLE_DO_B  aller à l'état 36
+    BOUCLE_DO_C  aller à l'état 37
+    BOUCLE_DO    aller à l'état 38
+    BOUCLE_FOR   aller à l'état 39
+
+
+état 40
 
     3 DEC_TOTAL: DECLARATION_CONST bal_ouv mc_sub mc_variable bal_fer . DECLARATION
 
     bal_ouv       décalage et aller à l'état 22
     bal_slch_ouv  décalage et aller à l'état 23
 
-    DECLARATION  aller à l'état 57
+    DECLARATION  aller à l'état 88
 
 
-état 35
+état 41
 
    23 DECLARATION_SIMPLE: idf . ou DECLARATION_SIMPLE
    24                   | idf . mc_as TYPE bal_slch_fer pvg
 
-    mc_as  décalage et aller à l'état 58
-    ou     décalage et aller à l'état 59
+    mc_as  décalage et aller à l'état 89
+    ou     décalage et aller à l'état 90
 
 
-état 36
+état 42
 
     7 DECLARATION: bal_ouv mc_array . mc_as TYPE bal_fer DECLARATION_TAB DECLARATION
 
-    mc_as  décalage et aller à l'état 60
+    mc_as  décalage et aller à l'état 91
 
 
-état 37
+état 43
 
     6 DECLARATION: bal_ouv DECLARATION_SIMPLE . DECLARATION
 
     bal_ouv       décalage et aller à l'état 22
     bal_slch_ouv  décalage et aller à l'état 23
 
-    DECLARATION  aller à l'état 61
+    DECLARATION  aller à l'état 92
 
 
-état 38
+état 44
 
     8 DECLARATION: bal_slch_ouv mc_sub . mc_variable bal_fer
 
-    mc_variable  décalage et aller à l'état 62
+    mc_variable  décalage et aller à l'état 93
 
 
-état 39
+état 45
 
    10 DECLARATION_CONST: bal_ouv . mc_sub mc_constante bal_fer $@1 LISTE_DEC_CONST
 
-    mc_sub  décalage et aller à l'état 63
+    mc_sub  décalage et aller à l'état 94
 
 
-état 40
+état 46
 
     2 DEC_TOTAL: bal_ouv mc_sub mc_variable bal_fer DECLARATION DECLARATION_CONST .
 
     $défaut  réduction par utilisation de la règle 2 (DEC_TOTAL)
 
 
-état 41
+état 47
 
    11 LISTE_DEC_CONST: bal_ouv . DECLARATION_SIMPLE LISTE_DEC_CONST
    12                | bal_ouv . DEC_CONST_EGAL LISTE_DEC_CONST
 
-    idf  décalage et aller à l'état 64
+    idf  décalage et aller à l'état 95
 
-    DEC_CONST_EGAL      aller à l'état 65
-    DECLARATION_SIMPLE  aller à l'état 66
+    DEC_CONST_EGAL      aller à l'état 96
+    DECLARATION_SIMPLE  aller à l'état 97
 
 
-état 42
+état 48
 
    13 LISTE_DEC_CONST: bal_slch_ouv . mc_sub mc_constante bal_fer
 
-    mc_sub  décalage et aller à l'état 67
+    mc_sub  décalage et aller à l'état 98
 
 
-état 43
+état 49
 
    10 DECLARATION_CONST: bal_ouv mc_sub mc_constante bal_fer $@1 LISTE_DEC_CONST .
 
     $défaut  réduction par utilisation de la règle 10 (DECLARATION_CONST)
 
 
-état 44
-
-   40 AFFECTATION: bal_ouv mc_aff . deuxpt idf vrg X bal_slch_fer
-   41            | bal_ouv mc_aff . deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
-
-    deuxpt  décalage et aller à l'état 68
-
-
-état 45
-
-   79 INPUT: bal_ouv mc_input . deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
-
-    deuxpt  décalage et aller à l'état 69
-
-
-état 46
-
-   35 BODY: bal_ouv mc_output . deuxpt OUTPUT BODY
-
-    deuxpt  décalage et aller à l'état 70
-
-
-état 47
-
-   93 INST_IF: bal_ouv mc_if . deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if . deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
-
-    deuxpt  décalage et aller à l'état 71
-
-
-état 48
-
-  103 BOUCLE_DO: bal_ouv mc_do . bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv mc_do bal_fer
-
-    bal_fer  décalage et aller à l'état 72
-
-
-état 49
-
-  111 BOUCLE_FOR: bal_ouv mc_for . idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv mc_for . idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
-
-    idf  décalage et aller à l'état 73
-
-
 état 50
 
-   39 BODY: bal_slch_ouv mc_body . bal_fer
+   41 AFFECTATION: bal_ouv mc_aff . deuxpt idf vrg X bal_slch_fer
+   42            | bal_ouv mc_aff . deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
 
-    bal_fer  décalage et aller à l'état 74
+    deuxpt  décalage et aller à l'état 99
 
 
 état 51
 
-    1 S: bal_ouv mc_exl mc_docprogram idf bal_fer DEC_TOTAL bal_ouv mc_body bal_fer BODY bal_slch_ouv . mc_docprogram bal_fer
+   78 INPUT: bal_ouv mc_input . deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
 
-    mc_docprogram  décalage et aller à l'état 75
+    deuxpt  décalage et aller à l'état 100
 
 
 état 52
+
+   36 BODY: bal_ouv mc_output . deuxpt OUTPUT $@3 BODY
+
+    deuxpt  décalage et aller à l'état 101
+
+
+état 53
+
+   95 IF_A: bal_ouv mc_if . deuxpt CONDITION
+
+    deuxpt  décalage et aller à l'état 102
+
+
+état 54
+
+  109 BOUCLE_DO_A: bal_ouv mc_do . bal_fer
+
+    bal_fer  décalage et aller à l'état 103
+
+
+état 55
+
+  120 BOUCLE_FOR: bal_ouv mc_for . idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv mc_for . idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
+
+    idf  décalage et aller à l'état 104
+
+
+état 56
+
+   40 BODY: bal_slch_ouv mc_body . bal_fer
+
+    bal_fer  décalage et aller à l'état 105
+
+
+état 57
+
+    1 S: bal_ouv mc_exl mc_docprogram idf bal_fer DEC_TOTAL bal_ouv mc_body bal_fer BODY bal_slch_ouv . mc_docprogram bal_fer
+
+    mc_docprogram  décalage et aller à l'état 106
+
+
+état 58
 
    33 BODY: AFFECTATION BODY .
 
     $défaut  réduction par utilisation de la règle 33 (BODY)
 
 
-état 53
+état 59
 
    34 BODY: INPUT BODY .
 
     $défaut  réduction par utilisation de la règle 34 (BODY)
 
 
-état 54
+état 60
 
-   36 BODY: INST_IF BODY .
+   96 IF_B: IF_A bal_fer . bal_ouv mc_then bal_fer INSTRUCTION
 
-    $défaut  réduction par utilisation de la règle 36 (BODY)
+    bal_ouv  décalage et aller à l'état 107
 
 
-état 55
+état 61
 
-   37 BODY: BOUCLE_DO BODY .
+   97 IF_C: IF_B bal_slch_ouv . mc_then bal_fer INST_ELSE
+   98     | IF_B bal_slch_ouv . mc_then bal_fer
+
+    mc_then  décalage et aller à l'état 108
+
+
+état 62
+
+   99 INST_IF: IF_C bal_slch_ouv . mc_if bal_fer
+
+    mc_if  décalage et aller à l'état 109
+
+
+état 63
+
+   37 BODY: INST_IF BODY .
 
     $défaut  réduction par utilisation de la règle 37 (BODY)
 
 
-état 56
+état 64
 
-   38 BODY: BOUCLE_FOR BODY .
+   41 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
+   42            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+   78 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
+   95 IF_A: bal_ouv . mc_if deuxpt CONDITION
+  109 BOUCLE_DO_A: bal_ouv . mc_do bal_fer
+  115 INSTRUCTION_BOUCLE_DO: bal_ouv . mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_DO
+  119                      | bal_ouv . mc_while deuxpt
+  120 BOUCLE_FOR: bal_ouv . mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv . mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
+
+    mc_aff     décalage et aller à l'état 50
+    mc_input   décalage et aller à l'état 51
+    mc_output  décalage et aller à l'état 110
+    mc_if      décalage et aller à l'état 53
+    mc_do      décalage et aller à l'état 54
+    mc_while   décalage et aller à l'état 111
+    mc_for     décalage et aller à l'état 55
+
+
+état 65
+
+  113 INSTRUCTION_BOUCLE_DO: AFFECTATION . INSTRUCTION_BOUCLE_DO
+
+    bal_ouv  décalage et aller à l'état 64
+
+    AFFECTATION            aller à l'état 65
+    INPUT                  aller à l'état 66
+    IF_A                   aller à l'état 31
+    IF_B                   aller à l'état 32
+    IF_C                   aller à l'état 33
+    INST_IF                aller à l'état 67
+    BOUCLE_DO_A            aller à l'état 35
+    BOUCLE_DO_B            aller à l'état 36
+    BOUCLE_DO_C            aller à l'état 37
+    BOUCLE_DO              aller à l'état 68
+    INSTRUCTION_BOUCLE_DO  aller à l'état 112
+    BOUCLE_FOR             aller à l'état 70
+
+
+état 66
+
+  114 INSTRUCTION_BOUCLE_DO: INPUT . INSTRUCTION_BOUCLE_DO
+
+    bal_ouv  décalage et aller à l'état 64
+
+    AFFECTATION            aller à l'état 65
+    INPUT                  aller à l'état 66
+    IF_A                   aller à l'état 31
+    IF_B                   aller à l'état 32
+    IF_C                   aller à l'état 33
+    INST_IF                aller à l'état 67
+    BOUCLE_DO_A            aller à l'état 35
+    BOUCLE_DO_B            aller à l'état 36
+    BOUCLE_DO_C            aller à l'état 37
+    BOUCLE_DO              aller à l'état 68
+    INSTRUCTION_BOUCLE_DO  aller à l'état 113
+    BOUCLE_FOR             aller à l'état 70
+
+
+état 67
+
+  116 INSTRUCTION_BOUCLE_DO: INST_IF . INSTRUCTION_BOUCLE_DO
+
+    bal_ouv  décalage et aller à l'état 64
+
+    AFFECTATION            aller à l'état 65
+    INPUT                  aller à l'état 66
+    IF_A                   aller à l'état 31
+    IF_B                   aller à l'état 32
+    IF_C                   aller à l'état 33
+    INST_IF                aller à l'état 67
+    BOUCLE_DO_A            aller à l'état 35
+    BOUCLE_DO_B            aller à l'état 36
+    BOUCLE_DO_C            aller à l'état 37
+    BOUCLE_DO              aller à l'état 68
+    INSTRUCTION_BOUCLE_DO  aller à l'état 114
+    BOUCLE_FOR             aller à l'état 70
+
+
+état 68
+
+  117 INSTRUCTION_BOUCLE_DO: BOUCLE_DO . INSTRUCTION_BOUCLE_DO
+
+    bal_ouv  décalage et aller à l'état 64
+
+    AFFECTATION            aller à l'état 65
+    INPUT                  aller à l'état 66
+    IF_A                   aller à l'état 31
+    IF_B                   aller à l'état 32
+    IF_C                   aller à l'état 33
+    INST_IF                aller à l'état 67
+    BOUCLE_DO_A            aller à l'état 35
+    BOUCLE_DO_B            aller à l'état 36
+    BOUCLE_DO_C            aller à l'état 37
+    BOUCLE_DO              aller à l'état 68
+    INSTRUCTION_BOUCLE_DO  aller à l'état 115
+    BOUCLE_FOR             aller à l'état 70
+
+
+état 69
+
+  110 BOUCLE_DO_B: BOUCLE_DO_A INSTRUCTION_BOUCLE_DO .
+
+    $défaut  réduction par utilisation de la règle 110 (BOUCLE_DO_B)
+
+
+état 70
+
+  118 INSTRUCTION_BOUCLE_DO: BOUCLE_FOR . INSTRUCTION_BOUCLE_DO
+
+    bal_ouv  décalage et aller à l'état 64
+
+    AFFECTATION            aller à l'état 65
+    INPUT                  aller à l'état 66
+    IF_A                   aller à l'état 31
+    IF_B                   aller à l'état 32
+    IF_C                   aller à l'état 33
+    INST_IF                aller à l'état 67
+    BOUCLE_DO_A            aller à l'état 35
+    BOUCLE_DO_B            aller à l'état 36
+    BOUCLE_DO_C            aller à l'état 37
+    BOUCLE_DO              aller à l'état 68
+    INSTRUCTION_BOUCLE_DO  aller à l'état 116
+    BOUCLE_FOR             aller à l'état 70
+
+
+état 71
+
+   62 OpLog: and .
+
+    $défaut  réduction par utilisation de la règle 62 (OpLog)
+
+
+état 72
+
+   63 OpLog: or .
+
+    $défaut  réduction par utilisation de la règle 63 (OpLog)
+
+
+état 73
+
+   61 EXPRESSION_LOGIQUE: not . par_ouv TYPE_EXP par_fer
+
+    par_ouv  décalage et aller à l'état 117
+
+
+état 74
+
+   72 MC_COMPARAISON: sup .
+
+    $défaut  réduction par utilisation de la règle 72 (MC_COMPARAISON)
+
+
+état 75
+
+   75 MC_COMPARAISON: inf .
+
+    $défaut  réduction par utilisation de la règle 75 (MC_COMPARAISON)
+
+
+état 76
+
+   73 MC_COMPARAISON: supeg .
+
+    $défaut  réduction par utilisation de la règle 73 (MC_COMPARAISON)
+
+
+état 77
+
+   74 MC_COMPARAISON: infeg .
+
+    $défaut  réduction par utilisation de la règle 74 (MC_COMPARAISON)
+
+
+état 78
+
+   76 MC_COMPARAISON: ega .
+
+    $défaut  réduction par utilisation de la règle 76 (MC_COMPARAISON)
+
+
+état 79
+
+   77 MC_COMPARAISON: dif .
+
+    $défaut  réduction par utilisation de la règle 77 (MC_COMPARAISON)
+
+
+état 80
+
+  100 CONDITION: EXPRESSION_LOGIQUE .
+
+    $défaut  réduction par utilisation de la règle 100 (CONDITION)
+
+
+état 81
+
+   60 EXPRESSION_LOGIQUE: OpLog . par_ouv EXPRESSIONS par_fer
+
+    par_ouv  décalage et aller à l'état 118
+
+
+état 82
+
+  101 CONDITION: EXPRESSION_COMPARAISON .
+
+    $défaut  réduction par utilisation de la règle 101 (CONDITION)
+
+
+état 83
+
+   71 EXPRESSION_COMPARAISON: MC_COMPARAISON . par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer
+
+    par_ouv  décalage et aller à l'état 119
+
+
+état 84
+
+  111 BOUCLE_DO_C: BOUCLE_DO_B CONDITION .
+
+    $défaut  réduction par utilisation de la règle 111 (BOUCLE_DO_C)
+
+
+état 85
+
+  112 BOUCLE_DO: BOUCLE_DO_C bal_slch_fer . bal_slch_ouv mc_do bal_fer
+
+    bal_slch_ouv  décalage et aller à l'état 120
+
+
+état 86
+
+   38 BODY: BOUCLE_DO BODY .
 
     $défaut  réduction par utilisation de la règle 38 (BODY)
 
 
-état 57
+état 87
+
+   39 BODY: BOUCLE_FOR BODY .
+
+    $défaut  réduction par utilisation de la règle 39 (BODY)
+
+
+état 88
 
     3 DEC_TOTAL: DECLARATION_CONST bal_ouv mc_sub mc_variable bal_fer DECLARATION .
 
     $défaut  réduction par utilisation de la règle 3 (DEC_TOTAL)
 
 
-état 58
+état 89
 
    24 DECLARATION_SIMPLE: idf mc_as . TYPE bal_slch_fer pvg
 
-    mc_int     décalage et aller à l'état 76
-    mc_float   décalage et aller à l'état 77
-    mc_char    décalage et aller à l'état 78
-    mc_string  décalage et aller à l'état 79
-    mc_bool    décalage et aller à l'état 80
+    mc_int     décalage et aller à l'état 121
+    mc_float   décalage et aller à l'état 122
+    mc_char    décalage et aller à l'état 123
+    mc_string  décalage et aller à l'état 124
+    mc_bool    décalage et aller à l'état 125
 
-    TYPE  aller à l'état 81
+    TYPE  aller à l'état 126
 
 
-état 59
+état 90
 
    23 DECLARATION_SIMPLE: idf ou . DECLARATION_SIMPLE
 
-    idf  décalage et aller à l'état 35
+    idf  décalage et aller à l'état 41
 
-    DECLARATION_SIMPLE  aller à l'état 82
+    DECLARATION_SIMPLE  aller à l'état 127
 
 
-état 60
+état 91
 
     7 DECLARATION: bal_ouv mc_array mc_as . TYPE bal_fer DECLARATION_TAB DECLARATION
 
-    mc_int     décalage et aller à l'état 76
-    mc_float   décalage et aller à l'état 77
-    mc_char    décalage et aller à l'état 78
-    mc_string  décalage et aller à l'état 79
-    mc_bool    décalage et aller à l'état 80
+    mc_int     décalage et aller à l'état 121
+    mc_float   décalage et aller à l'état 122
+    mc_char    décalage et aller à l'état 123
+    mc_string  décalage et aller à l'état 124
+    mc_bool    décalage et aller à l'état 125
 
-    TYPE  aller à l'état 83
+    TYPE  aller à l'état 128
 
 
-état 61
+état 92
 
     6 DECLARATION: bal_ouv DECLARATION_SIMPLE DECLARATION .
 
     $défaut  réduction par utilisation de la règle 6 (DECLARATION)
 
 
-état 62
+état 93
 
     8 DECLARATION: bal_slch_ouv mc_sub mc_variable . bal_fer
 
-    bal_fer  décalage et aller à l'état 84
+    bal_fer  décalage et aller à l'état 129
 
 
-état 63
+état 94
 
    10 DECLARATION_CONST: bal_ouv mc_sub . mc_constante bal_fer $@1 LISTE_DEC_CONST
 
     mc_constante  décalage et aller à l'état 15
 
 
-état 64
+état 95
 
    14 DEC_CONST_EGAL: idf . egal SWITCH_CST_TYPES bal_slch_fer pvg
    23 DECLARATION_SIMPLE: idf . ou DECLARATION_SIMPLE
    24                   | idf . mc_as TYPE bal_slch_fer pvg
 
-    mc_as  décalage et aller à l'état 58
-    ou     décalage et aller à l'état 59
-    egal   décalage et aller à l'état 85
+    mc_as  décalage et aller à l'état 89
+    ou     décalage et aller à l'état 90
+    egal   décalage et aller à l'état 130
 
 
-état 65
+état 96
 
    12 LISTE_DEC_CONST: bal_ouv DEC_CONST_EGAL . LISTE_DEC_CONST
 
-    bal_ouv       décalage et aller à l'état 41
-    bal_slch_ouv  décalage et aller à l'état 42
+    bal_ouv       décalage et aller à l'état 47
+    bal_slch_ouv  décalage et aller à l'état 48
 
-    LISTE_DEC_CONST  aller à l'état 86
+    LISTE_DEC_CONST  aller à l'état 131
 
 
-état 66
+état 97
 
    11 LISTE_DEC_CONST: bal_ouv DECLARATION_SIMPLE . LISTE_DEC_CONST
 
-    bal_ouv       décalage et aller à l'état 41
-    bal_slch_ouv  décalage et aller à l'état 42
+    bal_ouv       décalage et aller à l'état 47
+    bal_slch_ouv  décalage et aller à l'état 48
 
-    LISTE_DEC_CONST  aller à l'état 87
+    LISTE_DEC_CONST  aller à l'état 132
 
 
-état 67
+état 98
 
    13 LISTE_DEC_CONST: bal_slch_ouv mc_sub . mc_constante bal_fer
 
-    mc_constante  décalage et aller à l'état 88
+    mc_constante  décalage et aller à l'état 133
 
 
-état 68
+état 99
 
-   40 AFFECTATION: bal_ouv mc_aff deuxpt . idf vrg X bal_slch_fer
-   41            | bal_ouv mc_aff deuxpt . idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+   41 AFFECTATION: bal_ouv mc_aff deuxpt . idf vrg X bal_slch_fer
+   42            | bal_ouv mc_aff deuxpt . idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
 
-    idf  décalage et aller à l'état 89
-
-
-état 69
-
-   79 INPUT: bal_ouv mc_input deuxpt . idf chaine_gauche SIGNE_FORMATAGE chaine_droite
-
-    idf  décalage et aller à l'état 90
+    idf  décalage et aller à l'état 134
 
 
-état 70
+état 100
 
-   35 BODY: bal_ouv mc_output deuxpt . OUTPUT BODY
+   78 INPUT: bal_ouv mc_input deuxpt . idf chaine_gauche SIGNE_FORMATAGE chaine_droite
 
-    chaine_gauche  décalage et aller à l'état 91
-    simple_string  décalage et aller à l'état 92
-
-    OUTPUT  aller à l'état 93
+    idf  décalage et aller à l'état 135
 
 
-état 71
+état 101
 
-   93 INST_IF: bal_ouv mc_if deuxpt . CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt . CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
+   36 BODY: bal_ouv mc_output deuxpt . OUTPUT $@3 BODY
 
-    and    décalage et aller à l'état 94
-    or     décalage et aller à l'état 95
-    not    décalage et aller à l'état 96
-    sup    décalage et aller à l'état 97
-    inf    décalage et aller à l'état 98
-    supeg  décalage et aller à l'état 99
-    infeg  décalage et aller à l'état 100
-    ega    décalage et aller à l'état 101
-    dif    décalage et aller à l'état 102
+    chaine_gauche  décalage et aller à l'état 136
+    simple_string  décalage et aller à l'état 137
 
-    EXPRESSION_LOGIQUE      aller à l'état 103
-    EXPRESSION_COMPARAISON  aller à l'état 104
-    MC_COMPARAISON          aller à l'état 105
-    CONDITION               aller à l'état 106
+    OUTPUT  aller à l'état 138
 
 
-état 72
+état 102
 
-  103 BOUCLE_DO: bal_ouv mc_do bal_fer . INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv mc_do bal_fer
+   95 IF_A: bal_ouv mc_if deuxpt . CONDITION
 
-    bal_ouv  décalage et aller à l'état 107
+    and    décalage et aller à l'état 71
+    or     décalage et aller à l'état 72
+    not    décalage et aller à l'état 73
+    sup    décalage et aller à l'état 74
+    inf    décalage et aller à l'état 75
+    supeg  décalage et aller à l'état 76
+    infeg  décalage et aller à l'état 77
+    ega    décalage et aller à l'état 78
+    dif    décalage et aller à l'état 79
 
-    AFFECTATION            aller à l'état 108
-    INPUT                  aller à l'état 109
-    INST_IF                aller à l'état 110
-    BOUCLE_DO              aller à l'état 111
-    INSTRUCTION_BOUCLE_DO  aller à l'état 112
-    BOUCLE_FOR             aller à l'état 113
-
-
-état 73
-
-  111 BOUCLE_FOR: bal_ouv mc_for idf . egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv mc_for idf . egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
-
-    egal  décalage et aller à l'état 114
-
-
-état 74
-
-   39 BODY: bal_slch_ouv mc_body bal_fer .
-
-    $défaut  réduction par utilisation de la règle 39 (BODY)
+    EXPRESSION_LOGIQUE      aller à l'état 80
+    OpLog                   aller à l'état 81
+    EXPRESSION_COMPARAISON  aller à l'état 82
+    MC_COMPARAISON          aller à l'état 83
+    CONDITION               aller à l'état 139
 
 
-état 75
+état 103
+
+  109 BOUCLE_DO_A: bal_ouv mc_do bal_fer .
+
+    $défaut  réduction par utilisation de la règle 109 (BOUCLE_DO_A)
+
+
+état 104
+
+  120 BOUCLE_FOR: bal_ouv mc_for idf . egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv mc_for idf . egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
+
+    egal  décalage et aller à l'état 140
+
+
+état 105
+
+   40 BODY: bal_slch_ouv mc_body bal_fer .
+
+    $défaut  réduction par utilisation de la règle 40 (BODY)
+
+
+état 106
 
     1 S: bal_ouv mc_exl mc_docprogram idf bal_fer DEC_TOTAL bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram . bal_fer
 
-    bal_fer  décalage et aller à l'état 115
+    bal_fer  décalage et aller à l'état 141
 
 
-état 76
+état 107
+
+   96 IF_B: IF_A bal_fer bal_ouv . mc_then bal_fer INSTRUCTION
+
+    mc_then  décalage et aller à l'état 142
+
+
+état 108
+
+   97 IF_C: IF_B bal_slch_ouv mc_then . bal_fer INST_ELSE
+   98     | IF_B bal_slch_ouv mc_then . bal_fer
+
+    bal_fer  décalage et aller à l'état 143
+
+
+état 109
+
+   99 INST_IF: IF_C bal_slch_ouv mc_if . bal_fer
+
+    bal_fer  décalage et aller à l'état 144
+
+
+état 110
+
+  115 INSTRUCTION_BOUCLE_DO: bal_ouv mc_output . deuxpt OUTPUT INSTRUCTION_BOUCLE_DO
+
+    deuxpt  décalage et aller à l'état 145
+
+
+état 111
+
+  119 INSTRUCTION_BOUCLE_DO: bal_ouv mc_while . deuxpt
+
+    deuxpt  décalage et aller à l'état 146
+
+
+état 112
+
+  113 INSTRUCTION_BOUCLE_DO: AFFECTATION INSTRUCTION_BOUCLE_DO .
+
+    $défaut  réduction par utilisation de la règle 113 (INSTRUCTION_BOUCLE_DO)
+
+
+état 113
+
+  114 INSTRUCTION_BOUCLE_DO: INPUT INSTRUCTION_BOUCLE_DO .
+
+    $défaut  réduction par utilisation de la règle 114 (INSTRUCTION_BOUCLE_DO)
+
+
+état 114
+
+  116 INSTRUCTION_BOUCLE_DO: INST_IF INSTRUCTION_BOUCLE_DO .
+
+    $défaut  réduction par utilisation de la règle 116 (INSTRUCTION_BOUCLE_DO)
+
+
+état 115
+
+  117 INSTRUCTION_BOUCLE_DO: BOUCLE_DO INSTRUCTION_BOUCLE_DO .
+
+    $défaut  réduction par utilisation de la règle 117 (INSTRUCTION_BOUCLE_DO)
+
+
+état 116
+
+  118 INSTRUCTION_BOUCLE_DO: BOUCLE_FOR INSTRUCTION_BOUCLE_DO .
+
+    $défaut  réduction par utilisation de la règle 118 (INSTRUCTION_BOUCLE_DO)
+
+
+état 117
+
+   61 EXPRESSION_LOGIQUE: not par_ouv . TYPE_EXP par_fer
+
+    idf       décalage et aller à l'état 147
+    cst_bool  décalage et aller à l'état 148
+    and       décalage et aller à l'état 71
+    or        décalage et aller à l'état 72
+    not       décalage et aller à l'état 73
+    sup       décalage et aller à l'état 74
+    inf       décalage et aller à l'état 75
+    supeg     décalage et aller à l'état 76
+    infeg     décalage et aller à l'état 77
+    ega       décalage et aller à l'état 78
+    dif       décalage et aller à l'état 79
+
+    EXPRESSION_LOGIQUE      aller à l'état 149
+    OpLog                   aller à l'état 81
+    TYPE_EXP                aller à l'état 150
+    EXPRESSION_COMPARAISON  aller à l'état 151
+    MC_COMPARAISON          aller à l'état 83
+
+
+état 118
+
+   60 EXPRESSION_LOGIQUE: OpLog par_ouv . EXPRESSIONS par_fer
+
+    idf       décalage et aller à l'état 147
+    cst_bool  décalage et aller à l'état 148
+    and       décalage et aller à l'état 71
+    or        décalage et aller à l'état 72
+    not       décalage et aller à l'état 73
+    sup       décalage et aller à l'état 74
+    inf       décalage et aller à l'état 75
+    supeg     décalage et aller à l'état 76
+    infeg     décalage et aller à l'état 77
+    ega       décalage et aller à l'état 78
+    dif       décalage et aller à l'état 79
+
+    EXPRESSION_LOGIQUE      aller à l'état 149
+    OpLog                   aller à l'état 81
+    EXPRESSIONS             aller à l'état 152
+    TYPE_EXP                aller à l'état 153
+    EXPRESSION_COMPARAISON  aller à l'état 151
+    MC_COMPARAISON          aller à l'état 83
+
+
+état 119
+
+   71 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv . EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer
+
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_float         décalage et aller à l'état 157
+
+    EXPRESSION_ARITH  aller à l'état 158
+    TERM              aller à l'état 159
+
+
+état 120
+
+  112 BOUCLE_DO: BOUCLE_DO_C bal_slch_fer bal_slch_ouv . mc_do bal_fer
+
+    mc_do  décalage et aller à l'état 160
+
+
+état 121
 
    25 TYPE: mc_int .
 
     $défaut  réduction par utilisation de la règle 25 (TYPE)
 
 
-état 77
+état 122
 
    26 TYPE: mc_float .
 
     $défaut  réduction par utilisation de la règle 26 (TYPE)
 
 
-état 78
+état 123
 
    27 TYPE: mc_char .
 
     $défaut  réduction par utilisation de la règle 27 (TYPE)
 
 
-état 79
+état 124
 
    28 TYPE: mc_string .
 
     $défaut  réduction par utilisation de la règle 28 (TYPE)
 
 
-état 80
+état 125
 
    29 TYPE: mc_bool .
 
     $défaut  réduction par utilisation de la règle 29 (TYPE)
 
 
-état 81
+état 126
 
    24 DECLARATION_SIMPLE: idf mc_as TYPE . bal_slch_fer pvg
 
-    bal_slch_fer  décalage et aller à l'état 116
+    bal_slch_fer  décalage et aller à l'état 161
 
 
-état 82
+état 127
 
    23 DECLARATION_SIMPLE: idf ou DECLARATION_SIMPLE .
 
     $défaut  réduction par utilisation de la règle 23 (DECLARATION_SIMPLE)
 
 
-état 83
+état 128
 
     7 DECLARATION: bal_ouv mc_array mc_as TYPE . bal_fer DECLARATION_TAB DECLARATION
 
-    bal_fer  décalage et aller à l'état 117
+    bal_fer  décalage et aller à l'état 162
 
 
-état 84
+état 129
 
     8 DECLARATION: bal_slch_ouv mc_sub mc_variable bal_fer .
 
     $défaut  réduction par utilisation de la règle 8 (DECLARATION)
 
 
-état 85
+état 130
 
    14 DEC_CONST_EGAL: idf egal . SWITCH_CST_TYPES bal_slch_fer pvg
 
-    par_ouv           décalage et aller à l'état 118
-    cst_unsigned_int  décalage et aller à l'état 119
-    cst_float         décalage et aller à l'état 120
-    cst_bool          décalage et aller à l'état 121
-    cst_char          décalage et aller à l'état 122
-    simple_string     décalage et aller à l'état 123
+    par_ouv           décalage et aller à l'état 163
+    cst_unsigned_int  décalage et aller à l'état 164
+    cst_float         décalage et aller à l'état 165
+    cst_bool          décalage et aller à l'état 166
+    cst_char          décalage et aller à l'état 167
+    simple_string     décalage et aller à l'état 168
 
-    SWITCH_CST_TYPES  aller à l'état 124
-    SWITCH_INT        aller à l'état 125
+    SWITCH_CST_TYPES  aller à l'état 169
+    SWITCH_INT        aller à l'état 170
 
 
-état 86
+état 131
 
    12 LISTE_DEC_CONST: bal_ouv DEC_CONST_EGAL LISTE_DEC_CONST .
 
     $défaut  réduction par utilisation de la règle 12 (LISTE_DEC_CONST)
 
 
-état 87
+état 132
 
    11 LISTE_DEC_CONST: bal_ouv DECLARATION_SIMPLE LISTE_DEC_CONST .
 
     $défaut  réduction par utilisation de la règle 11 (LISTE_DEC_CONST)
 
 
-état 88
+état 133
 
    13 LISTE_DEC_CONST: bal_slch_ouv mc_sub mc_constante . bal_fer
 
-    bal_fer  décalage et aller à l'état 126
+    bal_fer  décalage et aller à l'état 171
 
 
-état 89
+état 134
 
-   40 AFFECTATION: bal_ouv mc_aff deuxpt idf . vrg X bal_slch_fer
-   41            | bal_ouv mc_aff deuxpt idf . cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+   41 AFFECTATION: bal_ouv mc_aff deuxpt idf . vrg X bal_slch_fer
+   42            | bal_ouv mc_aff deuxpt idf . cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
 
-    cr_ouv  décalage et aller à l'état 127
-    vrg     décalage et aller à l'état 128
+    cr_ouv  décalage et aller à l'état 172
+    vrg     décalage et aller à l'état 173
 
 
-état 90
+état 135
 
-   79 INPUT: bal_ouv mc_input deuxpt idf . chaine_gauche SIGNE_FORMATAGE chaine_droite
+   78 INPUT: bal_ouv mc_input deuxpt idf . chaine_gauche SIGNE_FORMATAGE chaine_droite
 
-    chaine_gauche  décalage et aller à l'état 129
+    chaine_gauche  décalage et aller à l'état 174
 
 
-état 91
+état 136
 
-   80 OUTPUT: chaine_gauche . SIGNE_FORMATAGE chaine_outdr idf plus OUTPUT
-   82       | chaine_gauche . SIGNE_FORMATAGE chaine_outdr idf bal_slch_fer
+   79 OUTPUT: chaine_gauche . SIGNE_FORMATAGE chaine_outdr ID plus OUTPUT
+   81       | chaine_gauche . SIGNE_FORMATAGE chaine_outdr ID bal_slch_fer
 
-    dollar  décalage et aller à l'état 130
-    mod     décalage et aller à l'état 131
-    hash    décalage et aller à l'état 132
-    arob    décalage et aller à l'état 133
-    etcom   décalage et aller à l'état 134
+    dollar  décalage et aller à l'état 175
+    mod     décalage et aller à l'état 176
+    hash    décalage et aller à l'état 177
+    arob    décalage et aller à l'état 178
+    etcom   décalage et aller à l'état 179
 
-    SIGNE_FORMATAGE  aller à l'état 135
+    SIGNE_FORMATAGE  aller à l'état 180
 
 
-état 92
+état 137
 
-   81 OUTPUT: simple_string . plus OUTPUT
-   83       | simple_string . bal_slch_fer
+   80 OUTPUT: simple_string . plus OUTPUT
+   82       | simple_string . bal_slch_fer
 
-    bal_slch_fer  décalage et aller à l'état 136
-    plus          décalage et aller à l'état 137
+    bal_slch_fer  décalage et aller à l'état 181
+    plus          décalage et aller à l'état 182
 
 
-état 93
+état 138
 
-   35 BODY: bal_ouv mc_output deuxpt OUTPUT . BODY
+   36 BODY: bal_ouv mc_output deuxpt OUTPUT . $@3 BODY
 
-    bal_ouv       décalage et aller à l'état 26
-    bal_slch_ouv  décalage et aller à l'état 27
+    $défaut  réduction par utilisation de la règle 35 ($@3)
 
-    BODY         aller à l'état 138
-    AFFECTATION  aller à l'état 29
-    INPUT        aller à l'état 30
-    INST_IF      aller à l'état 31
-    BOUCLE_DO    aller à l'état 32
-    BOUCLE_FOR   aller à l'état 33
+    $@3  aller à l'état 183
 
 
-état 94
+état 139
 
-   60 EXPRESSION_LOGIQUE: and . par_ouv $@3 EXPRESSIONS par_fer
+   95 IF_A: bal_ouv mc_if deuxpt CONDITION .
 
-    par_ouv  décalage et aller à l'état 139
+    $défaut  réduction par utilisation de la règle 95 (IF_A)
 
 
-état 95
+état 140
 
-   62 EXPRESSION_LOGIQUE: or . par_ouv $@4 EXPRESSIONS par_fer
+  120 BOUCLE_FOR: bal_ouv mc_for idf egal . SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv mc_for idf egal . SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
 
-    par_ouv  décalage et aller à l'état 140
+    par_ouv           décalage et aller à l'état 163
+    cst_unsigned_int  décalage et aller à l'état 164
 
+    SWITCH_INT  aller à l'état 184
 
-état 96
 
-   64 EXPRESSION_LOGIQUE: not . par_ouv $@5 TYPE_EXP par_fer
-
-    par_ouv  décalage et aller à l'état 141
-
-
-état 97
-
-   73 MC_COMPARAISON: sup .
-
-    $défaut  réduction par utilisation de la règle 73 (MC_COMPARAISON)
-
-
-état 98
-
-   76 MC_COMPARAISON: inf .
-
-    $défaut  réduction par utilisation de la règle 76 (MC_COMPARAISON)
-
-
-état 99
-
-   74 MC_COMPARAISON: supeg .
-
-    $défaut  réduction par utilisation de la règle 74 (MC_COMPARAISON)
-
-
-état 100
-
-   75 MC_COMPARAISON: infeg .
-
-    $défaut  réduction par utilisation de la règle 75 (MC_COMPARAISON)
-
-
-état 101
-
-   77 MC_COMPARAISON: ega .
-
-    $défaut  réduction par utilisation de la règle 77 (MC_COMPARAISON)
-
-
-état 102
-
-   78 MC_COMPARAISON: dif .
-
-    $défaut  réduction par utilisation de la règle 78 (MC_COMPARAISON)
-
-
-état 103
-
-   95 CONDITION: EXPRESSION_LOGIQUE .
-
-    $défaut  réduction par utilisation de la règle 95 (CONDITION)
-
-
-état 104
-
-   96 CONDITION: EXPRESSION_COMPARAISON .
-
-    $défaut  réduction par utilisation de la règle 96 (CONDITION)
-
-
-état 105
-
-   72 EXPRESSION_COMPARAISON: MC_COMPARAISON . par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer
-
-    par_ouv  décalage et aller à l'état 142
-
-
-état 106
-
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION . bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION . bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
-
-    bal_fer  décalage et aller à l'état 143
-
-
-état 107
-
-   40 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
-   41            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
-   79 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
-   93 INST_IF: bal_ouv . mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv . mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
-  103 BOUCLE_DO: bal_ouv . mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv mc_do bal_fer
-  106 INSTRUCTION_BOUCLE_DO: bal_ouv . mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_DO
-  110                      | bal_ouv . mc_while deuxpt
-  111 BOUCLE_FOR: bal_ouv . mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv . mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
-
-    mc_aff     décalage et aller à l'état 44
-    mc_input   décalage et aller à l'état 45
-    mc_output  décalage et aller à l'état 144
-    mc_if      décalage et aller à l'état 47
-    mc_do      décalage et aller à l'état 48
-    mc_while   décalage et aller à l'état 145
-    mc_for     décalage et aller à l'état 49
-
-
-état 108
-
-  104 INSTRUCTION_BOUCLE_DO: AFFECTATION . INSTRUCTION_BOUCLE_DO
-
-    bal_ouv  décalage et aller à l'état 107
-
-    AFFECTATION            aller à l'état 108
-    INPUT                  aller à l'état 109
-    INST_IF                aller à l'état 110
-    BOUCLE_DO              aller à l'état 111
-    INSTRUCTION_BOUCLE_DO  aller à l'état 146
-    BOUCLE_FOR             aller à l'état 113
-
-
-état 109
-
-  105 INSTRUCTION_BOUCLE_DO: INPUT . INSTRUCTION_BOUCLE_DO
-
-    bal_ouv  décalage et aller à l'état 107
-
-    AFFECTATION            aller à l'état 108
-    INPUT                  aller à l'état 109
-    INST_IF                aller à l'état 110
-    BOUCLE_DO              aller à l'état 111
-    INSTRUCTION_BOUCLE_DO  aller à l'état 147
-    BOUCLE_FOR             aller à l'état 113
-
-
-état 110
-
-  107 INSTRUCTION_BOUCLE_DO: INST_IF . INSTRUCTION_BOUCLE_DO
-
-    bal_ouv  décalage et aller à l'état 107
-
-    AFFECTATION            aller à l'état 108
-    INPUT                  aller à l'état 109
-    INST_IF                aller à l'état 110
-    BOUCLE_DO              aller à l'état 111
-    INSTRUCTION_BOUCLE_DO  aller à l'état 148
-    BOUCLE_FOR             aller à l'état 113
-
-
-état 111
-
-  108 INSTRUCTION_BOUCLE_DO: BOUCLE_DO . INSTRUCTION_BOUCLE_DO
-
-    bal_ouv  décalage et aller à l'état 107
-
-    AFFECTATION            aller à l'état 108
-    INPUT                  aller à l'état 109
-    INST_IF                aller à l'état 110
-    BOUCLE_DO              aller à l'état 111
-    INSTRUCTION_BOUCLE_DO  aller à l'état 149
-    BOUCLE_FOR             aller à l'état 113
-
-
-état 112
-
-  103 BOUCLE_DO: bal_ouv mc_do bal_fer INSTRUCTION_BOUCLE_DO . CONDITION bal_slch_fer bal_slch_ouv mc_do bal_fer
-
-    and    décalage et aller à l'état 94
-    or     décalage et aller à l'état 95
-    not    décalage et aller à l'état 96
-    sup    décalage et aller à l'état 97
-    inf    décalage et aller à l'état 98
-    supeg  décalage et aller à l'état 99
-    infeg  décalage et aller à l'état 100
-    ega    décalage et aller à l'état 101
-    dif    décalage et aller à l'état 102
-
-    EXPRESSION_LOGIQUE      aller à l'état 103
-    EXPRESSION_COMPARAISON  aller à l'état 104
-    MC_COMPARAISON          aller à l'état 105
-    CONDITION               aller à l'état 150
-
-
-état 113
-
-  109 INSTRUCTION_BOUCLE_DO: BOUCLE_FOR . INSTRUCTION_BOUCLE_DO
-
-    bal_ouv  décalage et aller à l'état 107
-
-    AFFECTATION            aller à l'état 108
-    INPUT                  aller à l'état 109
-    INST_IF                aller à l'état 110
-    BOUCLE_DO              aller à l'état 111
-    INSTRUCTION_BOUCLE_DO  aller à l'état 151
-    BOUCLE_FOR             aller à l'état 113
-
-
-état 114
-
-  111 BOUCLE_FOR: bal_ouv mc_for idf egal . SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv mc_for idf egal . SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
-
-    par_ouv           décalage et aller à l'état 118
-    cst_unsigned_int  décalage et aller à l'état 119
-
-    SWITCH_INT  aller à l'état 152
-
-
-état 115
+état 141
 
     1 S: bal_ouv mc_exl mc_docprogram idf bal_fer DEC_TOTAL bal_ouv mc_body bal_fer BODY bal_slch_ouv mc_docprogram bal_fer .
 
     $défaut  réduction par utilisation de la règle 1 (S)
 
 
-état 116
+état 142
+
+   96 IF_B: IF_A bal_fer bal_ouv mc_then . bal_fer INSTRUCTION
+
+    bal_fer  décalage et aller à l'état 185
+
+
+état 143
+
+   97 IF_C: IF_B bal_slch_ouv mc_then bal_fer . INST_ELSE
+   98     | IF_B bal_slch_ouv mc_then bal_fer .
+
+    bal_ouv  décalage et aller à l'état 186
+
+    $défaut  réduction par utilisation de la règle 98 (IF_C)
+
+    INST_ELSE  aller à l'état 187
+
+
+état 144
+
+   99 INST_IF: IF_C bal_slch_ouv mc_if bal_fer .
+
+    $défaut  réduction par utilisation de la règle 99 (INST_IF)
+
+
+état 145
+
+  115 INSTRUCTION_BOUCLE_DO: bal_ouv mc_output deuxpt . OUTPUT INSTRUCTION_BOUCLE_DO
+
+    chaine_gauche  décalage et aller à l'état 136
+    simple_string  décalage et aller à l'état 137
+
+    OUTPUT  aller à l'état 188
+
+
+état 146
+
+  119 INSTRUCTION_BOUCLE_DO: bal_ouv mc_while deuxpt .
+
+    $défaut  réduction par utilisation de la règle 119 (INSTRUCTION_BOUCLE_DO)
+
+
+état 147
+
+   69 TYPE_EXP: idf .
+   70         | idf . cr_ouv cst_unsigned_int cr_fer
+
+    cr_ouv  décalage et aller à l'état 189
+
+    $défaut  réduction par utilisation de la règle 69 (TYPE_EXP)
+
+
+état 148
+
+   68 TYPE_EXP: cst_bool .
+
+    $défaut  réduction par utilisation de la règle 68 (TYPE_EXP)
+
+
+état 149
+
+   66 TYPE_EXP: EXPRESSION_LOGIQUE .
+
+    $défaut  réduction par utilisation de la règle 66 (TYPE_EXP)
+
+
+état 150
+
+   61 EXPRESSION_LOGIQUE: not par_ouv TYPE_EXP . par_fer
+
+    par_fer  décalage et aller à l'état 190
+
+
+état 151
+
+   67 TYPE_EXP: EXPRESSION_COMPARAISON .
+
+    $défaut  réduction par utilisation de la règle 67 (TYPE_EXP)
+
+
+état 152
+
+   60 EXPRESSION_LOGIQUE: OpLog par_ouv EXPRESSIONS . par_fer
+
+    par_fer  décalage et aller à l'état 191
+
+
+état 153
+
+   64 EXPRESSIONS: TYPE_EXP . vrg EXPRESSIONS
+   65            | TYPE_EXP . vrg TYPE_EXP
+
+    vrg  décalage et aller à l'état 192
+
+
+état 154
+
+   58 TERM: idf .
+   59     | idf . cr_ouv cst_unsigned_int cr_fer
+
+    cr_ouv  décalage et aller à l'état 193
+
+    $défaut  réduction par utilisation de la règle 58 (TERM)
+
+
+état 155
+
+   49 EXPRESSION_ARITH: par_ouv . EXPRESSION_ARITH par_fer
+   55 TERM: par_ouv . cst_int_neg par_fer
+
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_int_neg       décalage et aller à l'état 194
+    cst_float         décalage et aller à l'état 157
+
+    EXPRESSION_ARITH  aller à l'état 195
+    TERM              aller à l'état 159
+
+
+état 156
+
+   56 TERM: cst_unsigned_int .
+
+    $défaut  réduction par utilisation de la règle 56 (TERM)
+
+
+état 157
+
+   57 TERM: cst_float .
+
+    $défaut  réduction par utilisation de la règle 57 (TERM)
+
+
+état 158
+
+   50 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
+   71 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH . vrg EXPRESSION_ARITH par_fer
+
+    plus   décalage et aller à l'état 196
+    moins  décalage et aller à l'état 197
+    mult   décalage et aller à l'état 198
+    divis  décalage et aller à l'état 199
+    vrg    décalage et aller à l'état 200
+
+
+état 159
+
+   54 EXPRESSION_ARITH: TERM .
+
+    $défaut  réduction par utilisation de la règle 54 (EXPRESSION_ARITH)
+
+
+état 160
+
+  112 BOUCLE_DO: BOUCLE_DO_C bal_slch_fer bal_slch_ouv mc_do . bal_fer
+
+    bal_fer  décalage et aller à l'état 201
+
+
+état 161
 
    24 DECLARATION_SIMPLE: idf mc_as TYPE bal_slch_fer . pvg
 
-    pvg  décalage et aller à l'état 153
+    pvg  décalage et aller à l'état 202
 
 
-état 117
+état 162
 
     7 DECLARATION: bal_ouv mc_array mc_as TYPE bal_fer . DECLARATION_TAB DECLARATION
 
-    bal_ouv       décalage et aller à l'état 154
-    bal_slch_ouv  décalage et aller à l'état 155
+    bal_ouv       décalage et aller à l'état 203
+    bal_slch_ouv  décalage et aller à l'état 204
 
-    DECLARATION_TAB  aller à l'état 156
+    DECLARATION_TAB  aller à l'état 205
 
 
-état 118
+état 163
 
    20 SWITCH_INT: par_ouv . cst_int_pos par_fer
    21           | par_ouv . cst_int_neg par_fer
 
-    cst_int_pos  décalage et aller à l'état 157
-    cst_int_neg  décalage et aller à l'état 158
+    cst_int_pos  décalage et aller à l'état 206
+    cst_int_neg  décalage et aller à l'état 207
 
 
-état 119
+état 164
 
    22 SWITCH_INT: cst_unsigned_int .
 
     $défaut  réduction par utilisation de la règle 22 (SWITCH_INT)
 
 
-état 120
+état 165
 
    16 SWITCH_CST_TYPES: cst_float .
 
     $défaut  réduction par utilisation de la règle 16 (SWITCH_CST_TYPES)
 
 
-état 121
+état 166
 
    17 SWITCH_CST_TYPES: cst_bool .
 
     $défaut  réduction par utilisation de la règle 17 (SWITCH_CST_TYPES)
 
 
-état 122
+état 167
 
    18 SWITCH_CST_TYPES: cst_char .
 
     $défaut  réduction par utilisation de la règle 18 (SWITCH_CST_TYPES)
 
 
-état 123
+état 168
 
    19 SWITCH_CST_TYPES: simple_string .
 
     $défaut  réduction par utilisation de la règle 19 (SWITCH_CST_TYPES)
 
 
-état 124
+état 169
 
    14 DEC_CONST_EGAL: idf egal SWITCH_CST_TYPES . bal_slch_fer pvg
 
-    bal_slch_fer  décalage et aller à l'état 159
+    bal_slch_fer  décalage et aller à l'état 208
 
 
-état 125
+état 170
 
    15 SWITCH_CST_TYPES: SWITCH_INT .
 
     $défaut  réduction par utilisation de la règle 15 (SWITCH_CST_TYPES)
 
 
-état 126
+état 171
 
    13 LISTE_DEC_CONST: bal_slch_ouv mc_sub mc_constante bal_fer .
 
     $défaut  réduction par utilisation de la règle 13 (LISTE_DEC_CONST)
 
 
-état 127
-
-   41 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv . cst_unsigned_int cr_fer vrg X bal_slch_fer
-
-    cst_unsigned_int  décalage et aller à l'état 160
-
-
-état 128
-
-   40 AFFECTATION: bal_ouv mc_aff deuxpt idf vrg . X bal_slch_fer
-
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_float         décalage et aller à l'état 164
-    cst_bool          décalage et aller à l'état 165
-    cst_char          décalage et aller à l'état 166
-    and               décalage et aller à l'état 94
-    or                décalage et aller à l'état 95
-    not               décalage et aller à l'état 96
-    sup               décalage et aller à l'état 97
-    inf               décalage et aller à l'état 98
-    supeg             décalage et aller à l'état 99
-    infeg             décalage et aller à l'état 100
-    ega               décalage et aller à l'état 101
-    dif               décalage et aller à l'état 102
-    simple_string     décalage et aller à l'état 167
-
-    X                       aller à l'état 168
-    EXPRESSION_ARITH        aller à l'état 169
-    TERM                    aller à l'état 170
-    EXPRESSION_LOGIQUE      aller à l'état 171
-    EXPRESSION_COMPARAISON  aller à l'état 172
-    MC_COMPARAISON          aller à l'état 105
-
-
-état 129
-
-   79 INPUT: bal_ouv mc_input deuxpt idf chaine_gauche . SIGNE_FORMATAGE chaine_droite
-
-    dollar  décalage et aller à l'état 130
-    mod     décalage et aller à l'état 131
-    hash    décalage et aller à l'état 132
-    arob    décalage et aller à l'état 133
-    etcom   décalage et aller à l'état 134
-
-    SIGNE_FORMATAGE  aller à l'état 173
-
-
-état 130
-
-   84 SIGNE_FORMATAGE: dollar .
-
-    $défaut  réduction par utilisation de la règle 84 (SIGNE_FORMATAGE)
-
-
-état 131
-
-   85 SIGNE_FORMATAGE: mod .
-
-    $défaut  réduction par utilisation de la règle 85 (SIGNE_FORMATAGE)
-
-
-état 132
-
-   86 SIGNE_FORMATAGE: hash .
-
-    $défaut  réduction par utilisation de la règle 86 (SIGNE_FORMATAGE)
-
-
-état 133
-
-   87 SIGNE_FORMATAGE: arob .
-
-    $défaut  réduction par utilisation de la règle 87 (SIGNE_FORMATAGE)
-
-
-état 134
-
-   88 SIGNE_FORMATAGE: etcom .
-
-    $défaut  réduction par utilisation de la règle 88 (SIGNE_FORMATAGE)
-
-
-état 135
-
-   80 OUTPUT: chaine_gauche SIGNE_FORMATAGE . chaine_outdr idf plus OUTPUT
-   82       | chaine_gauche SIGNE_FORMATAGE . chaine_outdr idf bal_slch_fer
-
-    chaine_outdr  décalage et aller à l'état 174
-
-
-état 136
-
-   83 OUTPUT: simple_string bal_slch_fer .
-
-    $défaut  réduction par utilisation de la règle 83 (OUTPUT)
-
-
-état 137
-
-   81 OUTPUT: simple_string plus . OUTPUT
-
-    chaine_gauche  décalage et aller à l'état 91
-    simple_string  décalage et aller à l'état 92
-
-    OUTPUT  aller à l'état 175
-
-
-état 138
-
-   35 BODY: bal_ouv mc_output deuxpt OUTPUT BODY .
-
-    $défaut  réduction par utilisation de la règle 35 (BODY)
-
-
-état 139
-
-   60 EXPRESSION_LOGIQUE: and par_ouv . $@3 EXPRESSIONS par_fer
-
-    $défaut  réduction par utilisation de la règle 59 ($@3)
-
-    $@3  aller à l'état 176
-
-
-état 140
-
-   62 EXPRESSION_LOGIQUE: or par_ouv . $@4 EXPRESSIONS par_fer
-
-    $défaut  réduction par utilisation de la règle 61 ($@4)
-
-    $@4  aller à l'état 177
-
-
-état 141
-
-   64 EXPRESSION_LOGIQUE: not par_ouv . $@5 TYPE_EXP par_fer
-
-    $défaut  réduction par utilisation de la règle 63 ($@5)
-
-    $@5  aller à l'état 178
-
-
-état 142
-
-   72 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv . EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer
-
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_float         décalage et aller à l'état 164
-
-    EXPRESSION_ARITH  aller à l'état 179
-    TERM              aller à l'état 170
-
-
-état 143
-
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer . bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer . bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
-
-    bal_ouv  décalage et aller à l'état 180
-
-
-état 144
-
-  106 INSTRUCTION_BOUCLE_DO: bal_ouv mc_output . deuxpt OUTPUT INSTRUCTION_BOUCLE_DO
-
-    deuxpt  décalage et aller à l'état 181
-
-
-état 145
-
-  110 INSTRUCTION_BOUCLE_DO: bal_ouv mc_while . deuxpt
-
-    deuxpt  décalage et aller à l'état 182
-
-
-état 146
-
-  104 INSTRUCTION_BOUCLE_DO: AFFECTATION INSTRUCTION_BOUCLE_DO .
-
-    $défaut  réduction par utilisation de la règle 104 (INSTRUCTION_BOUCLE_DO)
-
-
-état 147
-
-  105 INSTRUCTION_BOUCLE_DO: INPUT INSTRUCTION_BOUCLE_DO .
-
-    $défaut  réduction par utilisation de la règle 105 (INSTRUCTION_BOUCLE_DO)
-
-
-état 148
-
-  107 INSTRUCTION_BOUCLE_DO: INST_IF INSTRUCTION_BOUCLE_DO .
-
-    $défaut  réduction par utilisation de la règle 107 (INSTRUCTION_BOUCLE_DO)
-
-
-état 149
-
-  108 INSTRUCTION_BOUCLE_DO: BOUCLE_DO INSTRUCTION_BOUCLE_DO .
-
-    $défaut  réduction par utilisation de la règle 108 (INSTRUCTION_BOUCLE_DO)
-
-
-état 150
-
-  103 BOUCLE_DO: bal_ouv mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION . bal_slch_fer bal_slch_ouv mc_do bal_fer
-
-    bal_slch_fer  décalage et aller à l'état 183
-
-
-état 151
-
-  109 INSTRUCTION_BOUCLE_DO: BOUCLE_FOR INSTRUCTION_BOUCLE_DO .
-
-    $défaut  réduction par utilisation de la règle 109 (INSTRUCTION_BOUCLE_DO)
-
-
-état 152
-
-  111 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT . mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv mc_for idf egal SWITCH_INT . mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
-
-    mc_until  décalage et aller à l'état 184
-
-
-état 153
-
-   24 DECLARATION_SIMPLE: idf mc_as TYPE bal_slch_fer pvg .
-
-    $défaut  réduction par utilisation de la règle 24 (DECLARATION_SIMPLE)
-
-
-état 154
-
-   31 DECLARATION_TAB: bal_ouv . idf deuxpt cst_unsigned_int bal_slch_fer $@2 DECLARATION_TAB
-
-    idf  décalage et aller à l'état 185
-
-
-état 155
-
-   32 DECLARATION_TAB: bal_slch_ouv . mc_array bal_fer
-
-    mc_array  décalage et aller à l'état 186
-
-
-état 156
-
-    7 DECLARATION: bal_ouv mc_array mc_as TYPE bal_fer DECLARATION_TAB . DECLARATION
-
-    bal_ouv       décalage et aller à l'état 22
-    bal_slch_ouv  décalage et aller à l'état 23
-
-    DECLARATION  aller à l'état 187
-
-
-état 157
-
-   20 SWITCH_INT: par_ouv cst_int_pos . par_fer
-
-    par_fer  décalage et aller à l'état 188
-
-
-état 158
-
-   21 SWITCH_INT: par_ouv cst_int_neg . par_fer
-
-    par_fer  décalage et aller à l'état 189
-
-
-état 159
-
-   14 DEC_CONST_EGAL: idf egal SWITCH_CST_TYPES bal_slch_fer . pvg
-
-    pvg  décalage et aller à l'état 190
-
-
-état 160
-
-   41 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int . cr_fer vrg X bal_slch_fer
-
-    cr_fer  décalage et aller à l'état 191
-
-
-état 161
-
-   57 TERM: idf .
-   58     | idf . cr_ouv cst_unsigned_int cr_fer
-
-    cr_ouv  décalage et aller à l'état 192
-
-    $défaut  réduction par utilisation de la règle 57 (TERM)
-
-
-état 162
-
-   48 EXPRESSION_ARITH: par_ouv . EXPRESSION_ARITH par_fer
-   54 TERM: par_ouv . cst_int_neg par_fer
-
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_int_neg       décalage et aller à l'état 193
-    cst_float         décalage et aller à l'état 164
-
-    EXPRESSION_ARITH  aller à l'état 194
-    TERM              aller à l'état 170
-
-
-état 163
-
-   55 TERM: cst_unsigned_int .
-
-    $défaut  réduction par utilisation de la règle 55 (TERM)
-
-
-état 164
-
-   56 TERM: cst_float .
-
-    $défaut  réduction par utilisation de la règle 56 (TERM)
-
-
-état 165
-
-   47 X: cst_bool .
-
-    $défaut  réduction par utilisation de la règle 47 (X)
-
-
-état 166
-
-   46 X: cst_char .
-
-    $défaut  réduction par utilisation de la règle 46 (X)
-
-
-état 167
-
-   45 X: simple_string .
-
-    $défaut  réduction par utilisation de la règle 45 (X)
-
-
-état 168
-
-   40 AFFECTATION: bal_ouv mc_aff deuxpt idf vrg X . bal_slch_fer
-
-    bal_slch_fer  décalage et aller à l'état 195
-
-
-état 169
-
-   42 X: EXPRESSION_ARITH .
-   49 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
-
-    plus   décalage et aller à l'état 196
-    moins  décalage et aller à l'état 197
-    mult   décalage et aller à l'état 198
-    divis  décalage et aller à l'état 199
-
-    $défaut  réduction par utilisation de la règle 42 (X)
-
-
-état 170
-
-   53 EXPRESSION_ARITH: TERM .
-
-    $défaut  réduction par utilisation de la règle 53 (EXPRESSION_ARITH)
-
-
-état 171
-
-   44 X: EXPRESSION_LOGIQUE .
-
-    $défaut  réduction par utilisation de la règle 44 (X)
-
-
 état 172
 
-   43 X: EXPRESSION_COMPARAISON .
+   42 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv . cst_unsigned_int cr_fer vrg X bal_slch_fer
 
-    $défaut  réduction par utilisation de la règle 43 (X)
+    cst_unsigned_int  décalage et aller à l'état 209
 
 
 état 173
 
-   79 INPUT: bal_ouv mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE . chaine_droite
+   41 AFFECTATION: bal_ouv mc_aff deuxpt idf vrg . X bal_slch_fer
 
-    chaine_droite  décalage et aller à l'état 200
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_float         décalage et aller à l'état 157
+    cst_bool          décalage et aller à l'état 210
+    cst_char          décalage et aller à l'état 211
+    and               décalage et aller à l'état 71
+    or                décalage et aller à l'état 72
+    not               décalage et aller à l'état 73
+    sup               décalage et aller à l'état 74
+    inf               décalage et aller à l'état 75
+    supeg             décalage et aller à l'état 76
+    infeg             décalage et aller à l'état 77
+    ega               décalage et aller à l'état 78
+    dif               décalage et aller à l'état 79
+    simple_string     décalage et aller à l'état 212
+
+    X                       aller à l'état 213
+    EXPRESSION_ARITH        aller à l'état 214
+    TERM                    aller à l'état 159
+    EXPRESSION_LOGIQUE      aller à l'état 215
+    OpLog                   aller à l'état 81
+    EXPRESSION_COMPARAISON  aller à l'état 216
+    MC_COMPARAISON          aller à l'état 83
 
 
 état 174
 
-   80 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr . idf plus OUTPUT
-   82       | chaine_gauche SIGNE_FORMATAGE chaine_outdr . idf bal_slch_fer
+   78 INPUT: bal_ouv mc_input deuxpt idf chaine_gauche . SIGNE_FORMATAGE chaine_droite
 
-    idf  décalage et aller à l'état 201
+    dollar  décalage et aller à l'état 175
+    mod     décalage et aller à l'état 176
+    hash    décalage et aller à l'état 177
+    arob    décalage et aller à l'état 178
+    etcom   décalage et aller à l'état 179
+
+    SIGNE_FORMATAGE  aller à l'état 217
 
 
 état 175
 
-   81 OUTPUT: simple_string plus OUTPUT .
+   85 SIGNE_FORMATAGE: dollar .
 
-    $défaut  réduction par utilisation de la règle 81 (OUTPUT)
+    $défaut  réduction par utilisation de la règle 85 (SIGNE_FORMATAGE)
 
 
 état 176
 
-   60 EXPRESSION_LOGIQUE: and par_ouv $@3 . EXPRESSIONS par_fer
+   86 SIGNE_FORMATAGE: mod .
 
-    idf       décalage et aller à l'état 202
-    cst_bool  décalage et aller à l'état 203
-    and       décalage et aller à l'état 94
-    or        décalage et aller à l'état 95
-    not       décalage et aller à l'état 96
-    sup       décalage et aller à l'état 97
-    inf       décalage et aller à l'état 98
-    supeg     décalage et aller à l'état 99
-    infeg     décalage et aller à l'état 100
-    ega       décalage et aller à l'état 101
-    dif       décalage et aller à l'état 102
-
-    EXPRESSION_LOGIQUE      aller à l'état 204
-    EXPRESSIONS             aller à l'état 205
-    TYPE_EXP                aller à l'état 206
-    EXPRESSION_COMPARAISON  aller à l'état 207
-    MC_COMPARAISON          aller à l'état 105
+    $défaut  réduction par utilisation de la règle 86 (SIGNE_FORMATAGE)
 
 
 état 177
 
-   62 EXPRESSION_LOGIQUE: or par_ouv $@4 . EXPRESSIONS par_fer
+   87 SIGNE_FORMATAGE: hash .
 
-    idf       décalage et aller à l'état 202
-    cst_bool  décalage et aller à l'état 203
-    and       décalage et aller à l'état 94
-    or        décalage et aller à l'état 95
-    not       décalage et aller à l'état 96
-    sup       décalage et aller à l'état 97
-    inf       décalage et aller à l'état 98
-    supeg     décalage et aller à l'état 99
-    infeg     décalage et aller à l'état 100
-    ega       décalage et aller à l'état 101
-    dif       décalage et aller à l'état 102
-
-    EXPRESSION_LOGIQUE      aller à l'état 204
-    EXPRESSIONS             aller à l'état 208
-    TYPE_EXP                aller à l'état 206
-    EXPRESSION_COMPARAISON  aller à l'état 207
-    MC_COMPARAISON          aller à l'état 105
+    $défaut  réduction par utilisation de la règle 87 (SIGNE_FORMATAGE)
 
 
 état 178
 
-   64 EXPRESSION_LOGIQUE: not par_ouv $@5 . TYPE_EXP par_fer
+   88 SIGNE_FORMATAGE: arob .
 
-    idf       décalage et aller à l'état 202
-    cst_bool  décalage et aller à l'état 203
-    and       décalage et aller à l'état 94
-    or        décalage et aller à l'état 95
-    not       décalage et aller à l'état 96
-    sup       décalage et aller à l'état 97
-    inf       décalage et aller à l'état 98
-    supeg     décalage et aller à l'état 99
-    infeg     décalage et aller à l'état 100
-    ega       décalage et aller à l'état 101
-    dif       décalage et aller à l'état 102
-
-    EXPRESSION_LOGIQUE      aller à l'état 204
-    TYPE_EXP                aller à l'état 209
-    EXPRESSION_COMPARAISON  aller à l'état 207
-    MC_COMPARAISON          aller à l'état 105
+    $défaut  réduction par utilisation de la règle 88 (SIGNE_FORMATAGE)
 
 
 état 179
 
-   49 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
-   72 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH . vrg EXPRESSION_ARITH par_fer
+   89 SIGNE_FORMATAGE: etcom .
 
-    plus   décalage et aller à l'état 196
-    moins  décalage et aller à l'état 197
-    mult   décalage et aller à l'état 198
-    divis  décalage et aller à l'état 199
-    vrg    décalage et aller à l'état 210
+    $défaut  réduction par utilisation de la règle 89 (SIGNE_FORMATAGE)
 
 
 état 180
 
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv . mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv . mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
+   79 OUTPUT: chaine_gauche SIGNE_FORMATAGE . chaine_outdr ID plus OUTPUT
+   81       | chaine_gauche SIGNE_FORMATAGE . chaine_outdr ID bal_slch_fer
 
-    mc_then  décalage et aller à l'état 211
+    chaine_outdr  décalage et aller à l'état 218
 
 
 état 181
 
-  106 INSTRUCTION_BOUCLE_DO: bal_ouv mc_output deuxpt . OUTPUT INSTRUCTION_BOUCLE_DO
+   82 OUTPUT: simple_string bal_slch_fer .
 
-    chaine_gauche  décalage et aller à l'état 91
-    simple_string  décalage et aller à l'état 92
-
-    OUTPUT  aller à l'état 212
+    $défaut  réduction par utilisation de la règle 82 (OUTPUT)
 
 
 état 182
 
-  110 INSTRUCTION_BOUCLE_DO: bal_ouv mc_while deuxpt .
+   80 OUTPUT: simple_string plus . OUTPUT
 
-    $défaut  réduction par utilisation de la règle 110 (INSTRUCTION_BOUCLE_DO)
+    chaine_gauche  décalage et aller à l'état 136
+    simple_string  décalage et aller à l'état 137
+
+    OUTPUT  aller à l'état 219
 
 
 état 183
 
-  103 BOUCLE_DO: bal_ouv mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer . bal_slch_ouv mc_do bal_fer
+   36 BODY: bal_ouv mc_output deuxpt OUTPUT $@3 . BODY
 
-    bal_slch_ouv  décalage et aller à l'état 213
+    bal_ouv       décalage et aller à l'état 26
+    bal_slch_ouv  décalage et aller à l'état 27
+
+    BODY         aller à l'état 220
+    AFFECTATION  aller à l'état 29
+    INPUT        aller à l'état 30
+    IF_A         aller à l'état 31
+    IF_B         aller à l'état 32
+    IF_C         aller à l'état 33
+    INST_IF      aller à l'état 34
+    BOUCLE_DO_A  aller à l'état 35
+    BOUCLE_DO_B  aller à l'état 36
+    BOUCLE_DO_C  aller à l'état 37
+    BOUCLE_DO    aller à l'état 38
+    BOUCLE_FOR   aller à l'état 39
 
 
 état 184
 
-  111 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until . SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv mc_for idf egal SWITCH_INT mc_until . idf bal_fer INSTRUCTION_BOUCLE_FOR
+  120 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT . mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv mc_for idf egal SWITCH_INT . mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
 
-    idf               décalage et aller à l'état 214
-    par_ouv           décalage et aller à l'état 118
-    cst_unsigned_int  décalage et aller à l'état 119
-
-    SWITCH_INT  aller à l'état 215
+    mc_until  décalage et aller à l'état 221
 
 
 état 185
 
-   31 DECLARATION_TAB: bal_ouv idf . deuxpt cst_unsigned_int bal_slch_fer $@2 DECLARATION_TAB
+   96 IF_B: IF_A bal_fer bal_ouv mc_then bal_fer . INSTRUCTION
 
-    deuxpt  décalage et aller à l'état 216
+    bal_ouv  décalage et aller à l'état 222
+
+    $défaut  réduction par utilisation de la règle 94 (INSTRUCTION)
+
+    AFFECTATION  aller à l'état 223
+    INPUT        aller à l'état 224
+    INSTRUCTION  aller à l'état 225
 
 
 état 186
 
-   32 DECLARATION_TAB: bal_slch_ouv mc_array . bal_fer
+  102 INST_ELSE: bal_ouv . mc_else bal_fer INSTRUCTION_ELSE
 
-    bal_fer  décalage et aller à l'état 217
+    mc_else  décalage et aller à l'état 226
 
 
 état 187
 
-    7 DECLARATION: bal_ouv mc_array mc_as TYPE bal_fer DECLARATION_TAB DECLARATION .
+   97 IF_C: IF_B bal_slch_ouv mc_then bal_fer INST_ELSE .
 
-    $défaut  réduction par utilisation de la règle 7 (DECLARATION)
+    $défaut  réduction par utilisation de la règle 97 (IF_C)
 
 
 état 188
 
-   20 SWITCH_INT: par_ouv cst_int_pos par_fer .
+  115 INSTRUCTION_BOUCLE_DO: bal_ouv mc_output deuxpt OUTPUT . INSTRUCTION_BOUCLE_DO
 
-    $défaut  réduction par utilisation de la règle 20 (SWITCH_INT)
+    bal_ouv  décalage et aller à l'état 64
+
+    AFFECTATION            aller à l'état 65
+    INPUT                  aller à l'état 66
+    IF_A                   aller à l'état 31
+    IF_B                   aller à l'état 32
+    IF_C                   aller à l'état 33
+    INST_IF                aller à l'état 67
+    BOUCLE_DO_A            aller à l'état 35
+    BOUCLE_DO_B            aller à l'état 36
+    BOUCLE_DO_C            aller à l'état 37
+    BOUCLE_DO              aller à l'état 68
+    INSTRUCTION_BOUCLE_DO  aller à l'état 227
+    BOUCLE_FOR             aller à l'état 70
 
 
 état 189
 
-   21 SWITCH_INT: par_ouv cst_int_neg par_fer .
+   70 TYPE_EXP: idf cr_ouv . cst_unsigned_int cr_fer
 
-    $défaut  réduction par utilisation de la règle 21 (SWITCH_INT)
+    cst_unsigned_int  décalage et aller à l'état 228
 
 
 état 190
 
-   14 DEC_CONST_EGAL: idf egal SWITCH_CST_TYPES bal_slch_fer pvg .
+   61 EXPRESSION_LOGIQUE: not par_ouv TYPE_EXP par_fer .
 
-    $défaut  réduction par utilisation de la règle 14 (DEC_CONST_EGAL)
+    $défaut  réduction par utilisation de la règle 61 (EXPRESSION_LOGIQUE)
 
 
 état 191
 
-   41 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer . vrg X bal_slch_fer
+   60 EXPRESSION_LOGIQUE: OpLog par_ouv EXPRESSIONS par_fer .
 
-    vrg  décalage et aller à l'état 218
+    $défaut  réduction par utilisation de la règle 60 (EXPRESSION_LOGIQUE)
 
 
 état 192
 
-   58 TERM: idf cr_ouv . cst_unsigned_int cr_fer
+   64 EXPRESSIONS: TYPE_EXP vrg . EXPRESSIONS
+   65            | TYPE_EXP vrg . TYPE_EXP
 
-    cst_unsigned_int  décalage et aller à l'état 219
+    idf       décalage et aller à l'état 147
+    cst_bool  décalage et aller à l'état 148
+    and       décalage et aller à l'état 71
+    or        décalage et aller à l'état 72
+    not       décalage et aller à l'état 73
+    sup       décalage et aller à l'état 74
+    inf       décalage et aller à l'état 75
+    supeg     décalage et aller à l'état 76
+    infeg     décalage et aller à l'état 77
+    ega       décalage et aller à l'état 78
+    dif       décalage et aller à l'état 79
+
+    EXPRESSION_LOGIQUE      aller à l'état 149
+    OpLog                   aller à l'état 81
+    EXPRESSIONS             aller à l'état 229
+    TYPE_EXP                aller à l'état 230
+    EXPRESSION_COMPARAISON  aller à l'état 151
+    MC_COMPARAISON          aller à l'état 83
 
 
 état 193
 
-   54 TERM: par_ouv cst_int_neg . par_fer
+   59 TERM: idf cr_ouv . cst_unsigned_int cr_fer
 
-    par_fer  décalage et aller à l'état 220
+    cst_unsigned_int  décalage et aller à l'état 231
 
 
 état 194
 
-   48 EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH . par_fer
-   49                 | EXPRESSION_ARITH . plus EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
+   55 TERM: par_ouv cst_int_neg . par_fer
 
-    par_fer  décalage et aller à l'état 221
+    par_fer  décalage et aller à l'état 232
+
+
+état 195
+
+   49 EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH . par_fer
+   50                 | EXPRESSION_ARITH . plus EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
+
+    par_fer  décalage et aller à l'état 233
     plus     décalage et aller à l'état 196
     moins    décalage et aller à l'état 197
     mult     décalage et aller à l'état 198
     divis    décalage et aller à l'état 199
 
 
-état 195
-
-   40 AFFECTATION: bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer .
-
-    $défaut  réduction par utilisation de la règle 40 (AFFECTATION)
-
-
 état 196
 
-   49 EXPRESSION_ARITH: EXPRESSION_ARITH plus . EXPRESSION_ARITH
+   50 EXPRESSION_ARITH: EXPRESSION_ARITH plus . EXPRESSION_ARITH
 
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_float         décalage et aller à l'état 164
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_float         décalage et aller à l'état 157
 
-    EXPRESSION_ARITH  aller à l'état 222
-    TERM              aller à l'état 170
+    EXPRESSION_ARITH  aller à l'état 234
+    TERM              aller à l'état 159
 
 
 état 197
 
-   50 EXPRESSION_ARITH: EXPRESSION_ARITH moins . EXPRESSION_ARITH
+   51 EXPRESSION_ARITH: EXPRESSION_ARITH moins . EXPRESSION_ARITH
 
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_float         décalage et aller à l'état 164
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_float         décalage et aller à l'état 157
 
-    EXPRESSION_ARITH  aller à l'état 223
-    TERM              aller à l'état 170
+    EXPRESSION_ARITH  aller à l'état 235
+    TERM              aller à l'état 159
 
 
 état 198
 
-   52 EXPRESSION_ARITH: EXPRESSION_ARITH mult . EXPRESSION_ARITH
+   53 EXPRESSION_ARITH: EXPRESSION_ARITH mult . EXPRESSION_ARITH
 
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_float         décalage et aller à l'état 164
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_float         décalage et aller à l'état 157
 
-    EXPRESSION_ARITH  aller à l'état 224
-    TERM              aller à l'état 170
+    EXPRESSION_ARITH  aller à l'état 236
+    TERM              aller à l'état 159
 
 
 état 199
 
-   51 EXPRESSION_ARITH: EXPRESSION_ARITH divis . EXPRESSION_ARITH
+   52 EXPRESSION_ARITH: EXPRESSION_ARITH divis . EXPRESSION_ARITH
 
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_float         décalage et aller à l'état 164
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_float         décalage et aller à l'état 157
 
-    EXPRESSION_ARITH  aller à l'état 225
-    TERM              aller à l'état 170
+    EXPRESSION_ARITH  aller à l'état 237
+    TERM              aller à l'état 159
 
 
 état 200
 
-   79 INPUT: bal_ouv mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite .
+   71 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg . EXPRESSION_ARITH par_fer
 
-    $défaut  réduction par utilisation de la règle 79 (INPUT)
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_float         décalage et aller à l'état 157
+
+    EXPRESSION_ARITH  aller à l'état 238
+    TERM              aller à l'état 159
 
 
 état 201
 
-   80 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr idf . plus OUTPUT
-   82       | chaine_gauche SIGNE_FORMATAGE chaine_outdr idf . bal_slch_fer
+  112 BOUCLE_DO: BOUCLE_DO_C bal_slch_fer bal_slch_ouv mc_do bal_fer .
 
-    bal_slch_fer  décalage et aller à l'état 226
-    plus          décalage et aller à l'état 227
+    $défaut  réduction par utilisation de la règle 112 (BOUCLE_DO)
 
 
 état 202
 
-   70 TYPE_EXP: idf .
-   71         | idf . cr_ouv cst_unsigned_int cr_fer
+   24 DECLARATION_SIMPLE: idf mc_as TYPE bal_slch_fer pvg .
 
-    cr_ouv  décalage et aller à l'état 228
-
-    $défaut  réduction par utilisation de la règle 70 (TYPE_EXP)
+    $défaut  réduction par utilisation de la règle 24 (DECLARATION_SIMPLE)
 
 
 état 203
 
-   69 TYPE_EXP: cst_bool .
+   31 DECLARATION_TAB: bal_ouv . idf deuxpt cst_unsigned_int bal_slch_fer $@2 DECLARATION_TAB
 
-    $défaut  réduction par utilisation de la règle 69 (TYPE_EXP)
+    idf  décalage et aller à l'état 239
 
 
 état 204
 
-   67 TYPE_EXP: EXPRESSION_LOGIQUE .
+   32 DECLARATION_TAB: bal_slch_ouv . mc_array bal_fer
 
-    $défaut  réduction par utilisation de la règle 67 (TYPE_EXP)
+    mc_array  décalage et aller à l'état 240
 
 
 état 205
 
-   60 EXPRESSION_LOGIQUE: and par_ouv $@3 EXPRESSIONS . par_fer
+    7 DECLARATION: bal_ouv mc_array mc_as TYPE bal_fer DECLARATION_TAB . DECLARATION
 
-    par_fer  décalage et aller à l'état 229
+    bal_ouv       décalage et aller à l'état 22
+    bal_slch_ouv  décalage et aller à l'état 23
+
+    DECLARATION  aller à l'état 241
 
 
 état 206
 
-   65 EXPRESSIONS: TYPE_EXP . vrg EXPRESSIONS
-   66            | TYPE_EXP . vrg TYPE_EXP
+   20 SWITCH_INT: par_ouv cst_int_pos . par_fer
 
-    vrg  décalage et aller à l'état 230
+    par_fer  décalage et aller à l'état 242
 
 
 état 207
 
-   68 TYPE_EXP: EXPRESSION_COMPARAISON .
+   21 SWITCH_INT: par_ouv cst_int_neg . par_fer
 
-    $défaut  réduction par utilisation de la règle 68 (TYPE_EXP)
+    par_fer  décalage et aller à l'état 243
 
 
 état 208
 
-   62 EXPRESSION_LOGIQUE: or par_ouv $@4 EXPRESSIONS . par_fer
+   14 DEC_CONST_EGAL: idf egal SWITCH_CST_TYPES bal_slch_fer . pvg
 
-    par_fer  décalage et aller à l'état 231
+    pvg  décalage et aller à l'état 244
 
 
 état 209
 
-   64 EXPRESSION_LOGIQUE: not par_ouv $@5 TYPE_EXP . par_fer
+   42 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int . cr_fer vrg X bal_slch_fer
 
-    par_fer  décalage et aller à l'état 232
+    cr_fer  décalage et aller à l'état 245
 
 
 état 210
 
-   72 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg . EXPRESSION_ARITH par_fer
+   48 X: cst_bool .
 
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_float         décalage et aller à l'état 164
-
-    EXPRESSION_ARITH  aller à l'état 233
-    TERM              aller à l'état 170
+    $défaut  réduction par utilisation de la règle 48 (X)
 
 
 état 211
 
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then . bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then . bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
+   47 X: cst_char .
 
-    bal_fer  décalage et aller à l'état 234
+    $défaut  réduction par utilisation de la règle 47 (X)
 
 
 état 212
 
-  106 INSTRUCTION_BOUCLE_DO: bal_ouv mc_output deuxpt OUTPUT . INSTRUCTION_BOUCLE_DO
+   46 X: simple_string .
 
-    bal_ouv  décalage et aller à l'état 107
-
-    AFFECTATION            aller à l'état 108
-    INPUT                  aller à l'état 109
-    INST_IF                aller à l'état 110
-    BOUCLE_DO              aller à l'état 111
-    INSTRUCTION_BOUCLE_DO  aller à l'état 235
-    BOUCLE_FOR             aller à l'état 113
+    $défaut  réduction par utilisation de la règle 46 (X)
 
 
 état 213
 
-  103 BOUCLE_DO: bal_ouv mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv . mc_do bal_fer
+   41 AFFECTATION: bal_ouv mc_aff deuxpt idf vrg X . bal_slch_fer
 
-    mc_do  décalage et aller à l'état 236
+    bal_slch_fer  décalage et aller à l'état 246
 
 
 état 214
 
-  112 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until idf . bal_fer INSTRUCTION_BOUCLE_FOR
+   43 X: EXPRESSION_ARITH .
+   50 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
 
-    bal_fer  décalage et aller à l'état 237
+    plus   décalage et aller à l'état 196
+    moins  décalage et aller à l'état 197
+    mult   décalage et aller à l'état 198
+    divis  décalage et aller à l'état 199
+
+    $défaut  réduction par utilisation de la règle 43 (X)
 
 
 état 215
 
-  111 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT . bal_fer INSTRUCTION_BOUCLE_FOR
+   45 X: EXPRESSION_LOGIQUE .
 
-    bal_fer  décalage et aller à l'état 238
+    $défaut  réduction par utilisation de la règle 45 (X)
 
 
 état 216
 
-   31 DECLARATION_TAB: bal_ouv idf deuxpt . cst_unsigned_int bal_slch_fer $@2 DECLARATION_TAB
+   44 X: EXPRESSION_COMPARAISON .
 
-    cst_unsigned_int  décalage et aller à l'état 239
+    $défaut  réduction par utilisation de la règle 44 (X)
 
 
 état 217
 
-   32 DECLARATION_TAB: bal_slch_ouv mc_array bal_fer .
+   78 INPUT: bal_ouv mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE . chaine_droite
 
-    $défaut  réduction par utilisation de la règle 32 (DECLARATION_TAB)
+    chaine_droite  décalage et aller à l'état 247
 
 
 état 218
 
-   41 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg . X bal_slch_fer
+   79 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr . ID plus OUTPUT
+   81       | chaine_gauche SIGNE_FORMATAGE chaine_outdr . ID bal_slch_fer
 
-    idf               décalage et aller à l'état 161
-    par_ouv           décalage et aller à l'état 162
-    cst_unsigned_int  décalage et aller à l'état 163
-    cst_float         décalage et aller à l'état 164
-    cst_bool          décalage et aller à l'état 165
-    cst_char          décalage et aller à l'état 166
-    and               décalage et aller à l'état 94
-    or                décalage et aller à l'état 95
-    not               décalage et aller à l'état 96
-    sup               décalage et aller à l'état 97
-    inf               décalage et aller à l'état 98
-    supeg             décalage et aller à l'état 99
-    infeg             décalage et aller à l'état 100
-    ega               décalage et aller à l'état 101
-    dif               décalage et aller à l'état 102
-    simple_string     décalage et aller à l'état 167
+    idf  décalage et aller à l'état 248
 
-    X                       aller à l'état 240
-    EXPRESSION_ARITH        aller à l'état 169
-    TERM                    aller à l'état 170
-    EXPRESSION_LOGIQUE      aller à l'état 171
-    EXPRESSION_COMPARAISON  aller à l'état 172
-    MC_COMPARAISON          aller à l'état 105
+    ID  aller à l'état 249
 
 
 état 219
 
-   58 TERM: idf cr_ouv cst_unsigned_int . cr_fer
+   80 OUTPUT: simple_string plus OUTPUT .
 
-    cr_fer  décalage et aller à l'état 241
+    $défaut  réduction par utilisation de la règle 80 (OUTPUT)
 
 
 état 220
 
-   54 TERM: par_ouv cst_int_neg par_fer .
+   36 BODY: bal_ouv mc_output deuxpt OUTPUT $@3 BODY .
 
-    $défaut  réduction par utilisation de la règle 54 (TERM)
+    $défaut  réduction par utilisation de la règle 36 (BODY)
 
 
 état 221
 
-   48 EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer .
+  120 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until . SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv mc_for idf egal SWITCH_INT mc_until . idf bal_fer INSTRUCTION_BOUCLE_FOR
 
-    $défaut  réduction par utilisation de la règle 48 (EXPRESSION_ARITH)
+    idf               décalage et aller à l'état 250
+    par_ouv           décalage et aller à l'état 163
+    cst_unsigned_int  décalage et aller à l'état 164
+
+    SWITCH_INT  aller à l'état 251
 
 
 état 222
 
-   49 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
-   49                 | EXPRESSION_ARITH plus EXPRESSION_ARITH .
-   50                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
+   41 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
+   42            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+   78 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
+   93 INSTRUCTION: bal_ouv . mc_output deuxpt OUTPUT $@4 INSTRUCTION
 
-    mult   décalage et aller à l'état 198
-    divis  décalage et aller à l'état 199
-
-    $défaut  réduction par utilisation de la règle 49 (EXPRESSION_ARITH)
+    mc_aff     décalage et aller à l'état 50
+    mc_input   décalage et aller à l'état 51
+    mc_output  décalage et aller à l'état 252
 
 
 état 223
 
-   49 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH moins EXPRESSION_ARITH .
-   51                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
+   90 INSTRUCTION: AFFECTATION . INSTRUCTION
+
+    bal_ouv  décalage et aller à l'état 222
+
+    $défaut  réduction par utilisation de la règle 94 (INSTRUCTION)
+
+    AFFECTATION  aller à l'état 223
+    INPUT        aller à l'état 224
+    INSTRUCTION  aller à l'état 253
+
+
+état 224
+
+   91 INSTRUCTION: INPUT . INSTRUCTION
+
+    bal_ouv  décalage et aller à l'état 222
+
+    $défaut  réduction par utilisation de la règle 94 (INSTRUCTION)
+
+    AFFECTATION  aller à l'état 223
+    INPUT        aller à l'état 224
+    INSTRUCTION  aller à l'état 254
+
+
+état 225
+
+   96 IF_B: IF_A bal_fer bal_ouv mc_then bal_fer INSTRUCTION .
+
+    $défaut  réduction par utilisation de la règle 96 (IF_B)
+
+
+état 226
+
+  102 INST_ELSE: bal_ouv mc_else . bal_fer INSTRUCTION_ELSE
+
+    bal_fer  décalage et aller à l'état 255
+
+
+état 227
+
+  115 INSTRUCTION_BOUCLE_DO: bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_DO .
+
+    $défaut  réduction par utilisation de la règle 115 (INSTRUCTION_BOUCLE_DO)
+
+
+état 228
+
+   70 TYPE_EXP: idf cr_ouv cst_unsigned_int . cr_fer
+
+    cr_fer  décalage et aller à l'état 256
+
+
+état 229
+
+   64 EXPRESSIONS: TYPE_EXP vrg EXPRESSIONS .
+
+    $défaut  réduction par utilisation de la règle 64 (EXPRESSIONS)
+
+
+état 230
+
+   64 EXPRESSIONS: TYPE_EXP . vrg EXPRESSIONS
+   65            | TYPE_EXP . vrg TYPE_EXP
+   65            | TYPE_EXP vrg TYPE_EXP .
+
+    vrg  décalage et aller à l'état 192
+
+    $défaut  réduction par utilisation de la règle 65 (EXPRESSIONS)
+
+
+état 231
+
+   59 TERM: idf cr_ouv cst_unsigned_int . cr_fer
+
+    cr_fer  décalage et aller à l'état 257
+
+
+état 232
+
+   55 TERM: par_ouv cst_int_neg par_fer .
+
+    $défaut  réduction par utilisation de la règle 55 (TERM)
+
+
+état 233
+
+   49 EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer .
+
+    $défaut  réduction par utilisation de la règle 49 (EXPRESSION_ARITH)
+
+
+état 234
+
+   50 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
+   50                 | EXPRESSION_ARITH plus EXPRESSION_ARITH .
+   51                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
 
     mult   décalage et aller à l'état 198
     divis  décalage et aller à l'état 199
@@ -2376,816 +2573,822 @@ INSTRUCTION_BOUCLE_FOR (106)
     $défaut  réduction par utilisation de la règle 50 (EXPRESSION_ARITH)
 
 
-état 224
+état 235
 
-   49 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH mult EXPRESSION_ARITH .
+   50 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH moins EXPRESSION_ARITH .
+   52                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
 
-    $défaut  réduction par utilisation de la règle 52 (EXPRESSION_ARITH)
-
-
-état 225
-
-   49 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH divis EXPRESSION_ARITH .
-   52                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
+    mult   décalage et aller à l'état 198
+    divis  décalage et aller à l'état 199
 
     $défaut  réduction par utilisation de la règle 51 (EXPRESSION_ARITH)
 
 
-état 226
+état 236
 
-   82 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr idf bal_slch_fer .
+   50 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH mult EXPRESSION_ARITH .
 
-    $défaut  réduction par utilisation de la règle 82 (OUTPUT)
-
-
-état 227
-
-   80 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr idf plus . OUTPUT
-
-    chaine_gauche  décalage et aller à l'état 91
-    simple_string  décalage et aller à l'état 92
-
-    OUTPUT  aller à l'état 242
+    $défaut  réduction par utilisation de la règle 53 (EXPRESSION_ARITH)
 
 
-état 228
+état 237
 
-   71 TYPE_EXP: idf cr_ouv . cst_unsigned_int cr_fer
+   50 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH divis EXPRESSION_ARITH .
+   53                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
 
-    cst_unsigned_int  décalage et aller à l'état 243
-
-
-état 229
-
-   60 EXPRESSION_LOGIQUE: and par_ouv $@3 EXPRESSIONS par_fer .
-
-    $défaut  réduction par utilisation de la règle 60 (EXPRESSION_LOGIQUE)
+    $défaut  réduction par utilisation de la règle 52 (EXPRESSION_ARITH)
 
 
-état 230
+état 238
 
-   65 EXPRESSIONS: TYPE_EXP vrg . EXPRESSIONS
-   66            | TYPE_EXP vrg . TYPE_EXP
+   50 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
+   51                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
+   52                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
+   53                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
+   71 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH . par_fer
 
-    idf       décalage et aller à l'état 202
-    cst_bool  décalage et aller à l'état 203
-    and       décalage et aller à l'état 94
-    or        décalage et aller à l'état 95
-    not       décalage et aller à l'état 96
-    sup       décalage et aller à l'état 97
-    inf       décalage et aller à l'état 98
-    supeg     décalage et aller à l'état 99
-    infeg     décalage et aller à l'état 100
-    ega       décalage et aller à l'état 101
-    dif       décalage et aller à l'état 102
-
-    EXPRESSION_LOGIQUE      aller à l'état 204
-    EXPRESSIONS             aller à l'état 244
-    TYPE_EXP                aller à l'état 245
-    EXPRESSION_COMPARAISON  aller à l'état 207
-    MC_COMPARAISON          aller à l'état 105
-
-
-état 231
-
-   62 EXPRESSION_LOGIQUE: or par_ouv $@4 EXPRESSIONS par_fer .
-
-    $défaut  réduction par utilisation de la règle 62 (EXPRESSION_LOGIQUE)
-
-
-état 232
-
-   64 EXPRESSION_LOGIQUE: not par_ouv $@5 TYPE_EXP par_fer .
-
-    $défaut  réduction par utilisation de la règle 64 (EXPRESSION_LOGIQUE)
-
-
-état 233
-
-   49 EXPRESSION_ARITH: EXPRESSION_ARITH . plus EXPRESSION_ARITH
-   50                 | EXPRESSION_ARITH . moins EXPRESSION_ARITH
-   51                 | EXPRESSION_ARITH . divis EXPRESSION_ARITH
-   52                 | EXPRESSION_ARITH . mult EXPRESSION_ARITH
-   72 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH . par_fer
-
-    par_fer  décalage et aller à l'état 246
+    par_fer  décalage et aller à l'état 258
     plus     décalage et aller à l'état 196
     moins    décalage et aller à l'état 197
     mult     décalage et aller à l'état 198
     divis    décalage et aller à l'état 199
 
 
-état 234
-
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer . INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer . INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
-
-    bal_ouv  décalage et aller à l'état 247
-
-    $défaut  réduction par utilisation de la règle 92 (INSTRUCTION)
-
-    AFFECTATION  aller à l'état 248
-    INPUT        aller à l'état 249
-    INSTRUCTION  aller à l'état 250
-
-
-état 235
-
-  106 INSTRUCTION_BOUCLE_DO: bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_DO .
-
-    $défaut  réduction par utilisation de la règle 106 (INSTRUCTION_BOUCLE_DO)
-
-
-état 236
-
-  103 BOUCLE_DO: bal_ouv mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv mc_do . bal_fer
-
-    bal_fer  décalage et aller à l'état 251
-
-
-état 237
-
-  112 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until idf bal_fer . INSTRUCTION_BOUCLE_FOR
-
-    bal_ouv       décalage et aller à l'état 252
-    bal_slch_ouv  décalage et aller à l'état 253
-
-    AFFECTATION             aller à l'état 254
-    INPUT                   aller à l'état 255
-    INST_IF                 aller à l'état 256
-    BOUCLE_DO               aller à l'état 257
-    BOUCLE_FOR              aller à l'état 258
-    INSTRUCTION_BOUCLE_FOR  aller à l'état 259
-
-
-état 238
-
-  111 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer . INSTRUCTION_BOUCLE_FOR
-
-    bal_ouv       décalage et aller à l'état 252
-    bal_slch_ouv  décalage et aller à l'état 253
-
-    AFFECTATION             aller à l'état 254
-    INPUT                   aller à l'état 255
-    INST_IF                 aller à l'état 256
-    BOUCLE_DO               aller à l'état 257
-    BOUCLE_FOR              aller à l'état 258
-    INSTRUCTION_BOUCLE_FOR  aller à l'état 260
-
-
 état 239
 
-   31 DECLARATION_TAB: bal_ouv idf deuxpt cst_unsigned_int . bal_slch_fer $@2 DECLARATION_TAB
+   31 DECLARATION_TAB: bal_ouv idf . deuxpt cst_unsigned_int bal_slch_fer $@2 DECLARATION_TAB
 
-    bal_slch_fer  décalage et aller à l'état 261
+    deuxpt  décalage et aller à l'état 259
 
 
 état 240
 
-   41 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X . bal_slch_fer
+   32 DECLARATION_TAB: bal_slch_ouv mc_array . bal_fer
 
-    bal_slch_fer  décalage et aller à l'état 262
+    bal_fer  décalage et aller à l'état 260
 
 
 état 241
 
-   58 TERM: idf cr_ouv cst_unsigned_int cr_fer .
+    7 DECLARATION: bal_ouv mc_array mc_as TYPE bal_fer DECLARATION_TAB DECLARATION .
 
-    $défaut  réduction par utilisation de la règle 58 (TERM)
+    $défaut  réduction par utilisation de la règle 7 (DECLARATION)
 
 
 état 242
 
-   80 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr idf plus OUTPUT .
+   20 SWITCH_INT: par_ouv cst_int_pos par_fer .
 
-    $défaut  réduction par utilisation de la règle 80 (OUTPUT)
+    $défaut  réduction par utilisation de la règle 20 (SWITCH_INT)
 
 
 état 243
 
-   71 TYPE_EXP: idf cr_ouv cst_unsigned_int . cr_fer
+   21 SWITCH_INT: par_ouv cst_int_neg par_fer .
 
-    cr_fer  décalage et aller à l'état 263
+    $défaut  réduction par utilisation de la règle 21 (SWITCH_INT)
 
 
 état 244
 
-   65 EXPRESSIONS: TYPE_EXP vrg EXPRESSIONS .
+   14 DEC_CONST_EGAL: idf egal SWITCH_CST_TYPES bal_slch_fer pvg .
 
-    $défaut  réduction par utilisation de la règle 65 (EXPRESSIONS)
+    $défaut  réduction par utilisation de la règle 14 (DEC_CONST_EGAL)
 
 
 état 245
 
-   65 EXPRESSIONS: TYPE_EXP . vrg EXPRESSIONS
-   66            | TYPE_EXP . vrg TYPE_EXP
-   66            | TYPE_EXP vrg TYPE_EXP .
+   42 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer . vrg X bal_slch_fer
 
-    vrg  décalage et aller à l'état 230
-
-    $défaut  réduction par utilisation de la règle 66 (EXPRESSIONS)
+    vrg  décalage et aller à l'état 261
 
 
 état 246
 
-   72 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer .
+   41 AFFECTATION: bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer .
 
-    $défaut  réduction par utilisation de la règle 72 (EXPRESSION_COMPARAISON)
+    $défaut  réduction par utilisation de la règle 41 (AFFECTATION)
 
 
 état 247
 
-   40 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
-   41            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
-   79 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
-   91 INSTRUCTION: bal_ouv . mc_output deuxpt OUTPUT INSTRUCTION
+   78 INPUT: bal_ouv mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite .
 
-    mc_aff     décalage et aller à l'état 44
-    mc_input   décalage et aller à l'état 45
-    mc_output  décalage et aller à l'état 264
+    $défaut  réduction par utilisation de la règle 78 (INPUT)
 
 
 état 248
 
-   89 INSTRUCTION: AFFECTATION . INSTRUCTION
+   83 ID: idf .
+   84   | idf . cr_ouv cst_unsigned_int cr_fer
 
-    bal_ouv  décalage et aller à l'état 247
+    cr_ouv  décalage et aller à l'état 262
 
-    $défaut  réduction par utilisation de la règle 92 (INSTRUCTION)
-
-    AFFECTATION  aller à l'état 248
-    INPUT        aller à l'état 249
-    INSTRUCTION  aller à l'état 265
+    $défaut  réduction par utilisation de la règle 83 (ID)
 
 
 état 249
 
-   90 INSTRUCTION: INPUT . INSTRUCTION
+   79 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr ID . plus OUTPUT
+   81       | chaine_gauche SIGNE_FORMATAGE chaine_outdr ID . bal_slch_fer
 
-    bal_ouv  décalage et aller à l'état 247
-
-    $défaut  réduction par utilisation de la règle 92 (INSTRUCTION)
-
-    AFFECTATION  aller à l'état 248
-    INPUT        aller à l'état 249
-    INSTRUCTION  aller à l'état 266
+    bal_slch_fer  décalage et aller à l'état 263
+    plus          décalage et aller à l'état 264
 
 
 état 250
 
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION . bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION . bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
+  121 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until idf . bal_fer INSTRUCTION_BOUCLE_FOR
 
-    bal_slch_ouv  décalage et aller à l'état 267
+    bal_fer  décalage et aller à l'état 265
 
 
 état 251
 
-  103 BOUCLE_DO: bal_ouv mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv mc_do bal_fer .
+  120 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT . bal_fer INSTRUCTION_BOUCLE_FOR
 
-    $défaut  réduction par utilisation de la règle 103 (BOUCLE_DO)
+    bal_fer  décalage et aller à l'état 266
 
 
 état 252
 
-   40 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
-   41            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
-   79 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
-   93 INST_IF: bal_ouv . mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv . mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
-  103 BOUCLE_DO: bal_ouv . mc_do bal_fer INSTRUCTION_BOUCLE_DO CONDITION bal_slch_fer bal_slch_ouv mc_do bal_fer
-  111 BOUCLE_FOR: bal_ouv . mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
-  112           | bal_ouv . mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
-  115 INSTRUCTION_BOUCLE_FOR: bal_ouv . mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR
+   93 INSTRUCTION: bal_ouv mc_output . deuxpt OUTPUT $@4 INSTRUCTION
 
-    mc_aff     décalage et aller à l'état 44
-    mc_input   décalage et aller à l'état 45
-    mc_output  décalage et aller à l'état 268
-    mc_if      décalage et aller à l'état 47
-    mc_do      décalage et aller à l'état 48
-    mc_for     décalage et aller à l'état 49
+    deuxpt  décalage et aller à l'état 267
 
 
 état 253
 
-  119 INSTRUCTION_BOUCLE_FOR: bal_slch_ouv . mc_for bal_fer
+   90 INSTRUCTION: AFFECTATION INSTRUCTION .
 
-    mc_for  décalage et aller à l'état 269
+    $défaut  réduction par utilisation de la règle 90 (INSTRUCTION)
 
 
 état 254
 
-  113 INSTRUCTION_BOUCLE_FOR: AFFECTATION . INSTRUCTION_BOUCLE_FOR
+   91 INSTRUCTION: INPUT INSTRUCTION .
 
-    bal_ouv       décalage et aller à l'état 252
-    bal_slch_ouv  décalage et aller à l'état 253
-
-    AFFECTATION             aller à l'état 254
-    INPUT                   aller à l'état 255
-    INST_IF                 aller à l'état 256
-    BOUCLE_DO               aller à l'état 257
-    BOUCLE_FOR              aller à l'état 258
-    INSTRUCTION_BOUCLE_FOR  aller à l'état 270
+    $défaut  réduction par utilisation de la règle 91 (INSTRUCTION)
 
 
 état 255
 
-  114 INSTRUCTION_BOUCLE_FOR: INPUT . INSTRUCTION_BOUCLE_FOR
+  102 INST_ELSE: bal_ouv mc_else bal_fer . INSTRUCTION_ELSE
 
-    bal_ouv       décalage et aller à l'état 252
-    bal_slch_ouv  décalage et aller à l'état 253
+    bal_ouv       décalage et aller à l'état 268
+    bal_slch_ouv  décalage et aller à l'état 269
 
-    AFFECTATION             aller à l'état 254
-    INPUT                   aller à l'état 255
-    INST_IF                 aller à l'état 256
-    BOUCLE_DO               aller à l'état 257
-    BOUCLE_FOR              aller à l'état 258
-    INSTRUCTION_BOUCLE_FOR  aller à l'état 271
+    AFFECTATION       aller à l'état 270
+    INPUT             aller à l'état 271
+    IF_A              aller à l'état 31
+    IF_B              aller à l'état 32
+    IF_C              aller à l'état 33
+    INST_IF           aller à l'état 272
+    INSTRUCTION_ELSE  aller à l'état 273
 
 
 état 256
 
-  116 INSTRUCTION_BOUCLE_FOR: INST_IF . INSTRUCTION_BOUCLE_FOR
+   70 TYPE_EXP: idf cr_ouv cst_unsigned_int cr_fer .
 
-    bal_ouv       décalage et aller à l'état 252
-    bal_slch_ouv  décalage et aller à l'état 253
-
-    AFFECTATION             aller à l'état 254
-    INPUT                   aller à l'état 255
-    INST_IF                 aller à l'état 256
-    BOUCLE_DO               aller à l'état 257
-    BOUCLE_FOR              aller à l'état 258
-    INSTRUCTION_BOUCLE_FOR  aller à l'état 272
+    $défaut  réduction par utilisation de la règle 70 (TYPE_EXP)
 
 
 état 257
 
-  117 INSTRUCTION_BOUCLE_FOR: BOUCLE_DO . INSTRUCTION_BOUCLE_FOR
+   59 TERM: idf cr_ouv cst_unsigned_int cr_fer .
 
-    bal_ouv       décalage et aller à l'état 252
-    bal_slch_ouv  décalage et aller à l'état 253
-
-    AFFECTATION             aller à l'état 254
-    INPUT                   aller à l'état 255
-    INST_IF                 aller à l'état 256
-    BOUCLE_DO               aller à l'état 257
-    BOUCLE_FOR              aller à l'état 258
-    INSTRUCTION_BOUCLE_FOR  aller à l'état 273
+    $défaut  réduction par utilisation de la règle 59 (TERM)
 
 
 état 258
 
-  118 INSTRUCTION_BOUCLE_FOR: BOUCLE_FOR . INSTRUCTION_BOUCLE_FOR
+   71 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer .
 
-    bal_ouv       décalage et aller à l'état 252
-    bal_slch_ouv  décalage et aller à l'état 253
-
-    AFFECTATION             aller à l'état 254
-    INPUT                   aller à l'état 255
-    INST_IF                 aller à l'état 256
-    BOUCLE_DO               aller à l'état 257
-    BOUCLE_FOR              aller à l'état 258
-    INSTRUCTION_BOUCLE_FOR  aller à l'état 274
+    $défaut  réduction par utilisation de la règle 71 (EXPRESSION_COMPARAISON)
 
 
 état 259
 
-  112 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR .
+   31 DECLARATION_TAB: bal_ouv idf deuxpt . cst_unsigned_int bal_slch_fer $@2 DECLARATION_TAB
 
-    $défaut  réduction par utilisation de la règle 112 (BOUCLE_FOR)
+    cst_unsigned_int  décalage et aller à l'état 274
 
 
 état 260
 
-  111 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR .
+   32 DECLARATION_TAB: bal_slch_ouv mc_array bal_fer .
 
-    $défaut  réduction par utilisation de la règle 111 (BOUCLE_FOR)
+    $défaut  réduction par utilisation de la règle 32 (DECLARATION_TAB)
 
 
 état 261
+
+   42 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg . X bal_slch_fer
+
+    idf               décalage et aller à l'état 154
+    par_ouv           décalage et aller à l'état 155
+    cst_unsigned_int  décalage et aller à l'état 156
+    cst_float         décalage et aller à l'état 157
+    cst_bool          décalage et aller à l'état 210
+    cst_char          décalage et aller à l'état 211
+    and               décalage et aller à l'état 71
+    or                décalage et aller à l'état 72
+    not               décalage et aller à l'état 73
+    sup               décalage et aller à l'état 74
+    inf               décalage et aller à l'état 75
+    supeg             décalage et aller à l'état 76
+    infeg             décalage et aller à l'état 77
+    ega               décalage et aller à l'état 78
+    dif               décalage et aller à l'état 79
+    simple_string     décalage et aller à l'état 212
+
+    X                       aller à l'état 275
+    EXPRESSION_ARITH        aller à l'état 214
+    TERM                    aller à l'état 159
+    EXPRESSION_LOGIQUE      aller à l'état 215
+    OpLog                   aller à l'état 81
+    EXPRESSION_COMPARAISON  aller à l'état 216
+    MC_COMPARAISON          aller à l'état 83
+
+
+état 262
+
+   84 ID: idf cr_ouv . cst_unsigned_int cr_fer
+
+    cst_unsigned_int  décalage et aller à l'état 276
+
+
+état 263
+
+   81 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr ID bal_slch_fer .
+
+    $défaut  réduction par utilisation de la règle 81 (OUTPUT)
+
+
+état 264
+
+   79 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr ID plus . OUTPUT
+
+    chaine_gauche  décalage et aller à l'état 136
+    simple_string  décalage et aller à l'état 137
+
+    OUTPUT  aller à l'état 277
+
+
+état 265
+
+  121 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until idf bal_fer . INSTRUCTION_BOUCLE_FOR
+
+    bal_ouv       décalage et aller à l'état 278
+    bal_slch_ouv  décalage et aller à l'état 279
+
+    AFFECTATION             aller à l'état 280
+    INPUT                   aller à l'état 281
+    IF_A                    aller à l'état 31
+    IF_B                    aller à l'état 32
+    IF_C                    aller à l'état 33
+    INST_IF                 aller à l'état 282
+    BOUCLE_DO_A             aller à l'état 35
+    BOUCLE_DO_B             aller à l'état 36
+    BOUCLE_DO_C             aller à l'état 37
+    BOUCLE_DO               aller à l'état 283
+    BOUCLE_FOR              aller à l'état 284
+    INSTRUCTION_BOUCLE_FOR  aller à l'état 285
+
+
+état 266
+
+  120 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer . INSTRUCTION_BOUCLE_FOR
+
+    bal_ouv       décalage et aller à l'état 278
+    bal_slch_ouv  décalage et aller à l'état 279
+
+    AFFECTATION             aller à l'état 280
+    INPUT                   aller à l'état 281
+    IF_A                    aller à l'état 31
+    IF_B                    aller à l'état 32
+    IF_C                    aller à l'état 33
+    INST_IF                 aller à l'état 282
+    BOUCLE_DO_A             aller à l'état 35
+    BOUCLE_DO_B             aller à l'état 36
+    BOUCLE_DO_C             aller à l'état 37
+    BOUCLE_DO               aller à l'état 283
+    BOUCLE_FOR              aller à l'état 284
+    INSTRUCTION_BOUCLE_FOR  aller à l'état 286
+
+
+état 267
+
+   93 INSTRUCTION: bal_ouv mc_output deuxpt . OUTPUT $@4 INSTRUCTION
+
+    chaine_gauche  décalage et aller à l'état 136
+    simple_string  décalage et aller à l'état 137
+
+    OUTPUT  aller à l'état 287
+
+
+état 268
+
+   41 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
+   42            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+   78 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
+   95 IF_A: bal_ouv . mc_if deuxpt CONDITION
+  106 INSTRUCTION_ELSE: bal_ouv . mc_output deuxpt OUTPUT $@5 INSTRUCTION_ELSE
+
+    mc_aff     décalage et aller à l'état 50
+    mc_input   décalage et aller à l'état 51
+    mc_output  décalage et aller à l'état 288
+    mc_if      décalage et aller à l'état 53
+
+
+état 269
+
+  108 INSTRUCTION_ELSE: bal_slch_ouv . mc_else bal_fer
+
+    mc_else  décalage et aller à l'état 289
+
+
+état 270
+
+  103 INSTRUCTION_ELSE: AFFECTATION . INSTRUCTION_ELSE
+
+    bal_ouv       décalage et aller à l'état 268
+    bal_slch_ouv  décalage et aller à l'état 269
+
+    AFFECTATION       aller à l'état 270
+    INPUT             aller à l'état 271
+    IF_A              aller à l'état 31
+    IF_B              aller à l'état 32
+    IF_C              aller à l'état 33
+    INST_IF           aller à l'état 272
+    INSTRUCTION_ELSE  aller à l'état 290
+
+
+état 271
+
+  104 INSTRUCTION_ELSE: INPUT . INSTRUCTION_ELSE
+
+    bal_ouv       décalage et aller à l'état 268
+    bal_slch_ouv  décalage et aller à l'état 269
+
+    AFFECTATION       aller à l'état 270
+    INPUT             aller à l'état 271
+    IF_A              aller à l'état 31
+    IF_B              aller à l'état 32
+    IF_C              aller à l'état 33
+    INST_IF           aller à l'état 272
+    INSTRUCTION_ELSE  aller à l'état 291
+
+
+état 272
+
+  107 INSTRUCTION_ELSE: INST_IF . INSTRUCTION_ELSE
+
+    bal_ouv       décalage et aller à l'état 268
+    bal_slch_ouv  décalage et aller à l'état 269
+
+    AFFECTATION       aller à l'état 270
+    INPUT             aller à l'état 271
+    IF_A              aller à l'état 31
+    IF_B              aller à l'état 32
+    IF_C              aller à l'état 33
+    INST_IF           aller à l'état 272
+    INSTRUCTION_ELSE  aller à l'état 292
+
+
+état 273
+
+  102 INST_ELSE: bal_ouv mc_else bal_fer INSTRUCTION_ELSE .
+
+    $défaut  réduction par utilisation de la règle 102 (INST_ELSE)
+
+
+état 274
+
+   31 DECLARATION_TAB: bal_ouv idf deuxpt cst_unsigned_int . bal_slch_fer $@2 DECLARATION_TAB
+
+    bal_slch_fer  décalage et aller à l'état 293
+
+
+état 275
+
+   42 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X . bal_slch_fer
+
+    bal_slch_fer  décalage et aller à l'état 294
+
+
+état 276
+
+   84 ID: idf cr_ouv cst_unsigned_int . cr_fer
+
+    cr_fer  décalage et aller à l'état 295
+
+
+état 277
+
+   79 OUTPUT: chaine_gauche SIGNE_FORMATAGE chaine_outdr ID plus OUTPUT .
+
+    $défaut  réduction par utilisation de la règle 79 (OUTPUT)
+
+
+état 278
+
+   41 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
+   42            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
+   78 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
+   95 IF_A: bal_ouv . mc_if deuxpt CONDITION
+  109 BOUCLE_DO_A: bal_ouv . mc_do bal_fer
+  120 BOUCLE_FOR: bal_ouv . mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR
+  121           | bal_ouv . mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR
+  124 INSTRUCTION_BOUCLE_FOR: bal_ouv . mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR
+
+    mc_aff     décalage et aller à l'état 50
+    mc_input   décalage et aller à l'état 51
+    mc_output  décalage et aller à l'état 296
+    mc_if      décalage et aller à l'état 53
+    mc_do      décalage et aller à l'état 54
+    mc_for     décalage et aller à l'état 55
+
+
+état 279
+
+  128 INSTRUCTION_BOUCLE_FOR: bal_slch_ouv . mc_for bal_fer
+
+    mc_for  décalage et aller à l'état 297
+
+
+état 280
+
+  122 INSTRUCTION_BOUCLE_FOR: AFFECTATION . INSTRUCTION_BOUCLE_FOR
+
+    bal_ouv       décalage et aller à l'état 278
+    bal_slch_ouv  décalage et aller à l'état 279
+
+    AFFECTATION             aller à l'état 280
+    INPUT                   aller à l'état 281
+    IF_A                    aller à l'état 31
+    IF_B                    aller à l'état 32
+    IF_C                    aller à l'état 33
+    INST_IF                 aller à l'état 282
+    BOUCLE_DO_A             aller à l'état 35
+    BOUCLE_DO_B             aller à l'état 36
+    BOUCLE_DO_C             aller à l'état 37
+    BOUCLE_DO               aller à l'état 283
+    BOUCLE_FOR              aller à l'état 284
+    INSTRUCTION_BOUCLE_FOR  aller à l'état 298
+
+
+état 281
+
+  123 INSTRUCTION_BOUCLE_FOR: INPUT . INSTRUCTION_BOUCLE_FOR
+
+    bal_ouv       décalage et aller à l'état 278
+    bal_slch_ouv  décalage et aller à l'état 279
+
+    AFFECTATION             aller à l'état 280
+    INPUT                   aller à l'état 281
+    IF_A                    aller à l'état 31
+    IF_B                    aller à l'état 32
+    IF_C                    aller à l'état 33
+    INST_IF                 aller à l'état 282
+    BOUCLE_DO_A             aller à l'état 35
+    BOUCLE_DO_B             aller à l'état 36
+    BOUCLE_DO_C             aller à l'état 37
+    BOUCLE_DO               aller à l'état 283
+    BOUCLE_FOR              aller à l'état 284
+    INSTRUCTION_BOUCLE_FOR  aller à l'état 299
+
+
+état 282
+
+  125 INSTRUCTION_BOUCLE_FOR: INST_IF . INSTRUCTION_BOUCLE_FOR
+
+    bal_ouv       décalage et aller à l'état 278
+    bal_slch_ouv  décalage et aller à l'état 279
+
+    AFFECTATION             aller à l'état 280
+    INPUT                   aller à l'état 281
+    IF_A                    aller à l'état 31
+    IF_B                    aller à l'état 32
+    IF_C                    aller à l'état 33
+    INST_IF                 aller à l'état 282
+    BOUCLE_DO_A             aller à l'état 35
+    BOUCLE_DO_B             aller à l'état 36
+    BOUCLE_DO_C             aller à l'état 37
+    BOUCLE_DO               aller à l'état 283
+    BOUCLE_FOR              aller à l'état 284
+    INSTRUCTION_BOUCLE_FOR  aller à l'état 300
+
+
+état 283
+
+  126 INSTRUCTION_BOUCLE_FOR: BOUCLE_DO . INSTRUCTION_BOUCLE_FOR
+
+    bal_ouv       décalage et aller à l'état 278
+    bal_slch_ouv  décalage et aller à l'état 279
+
+    AFFECTATION             aller à l'état 280
+    INPUT                   aller à l'état 281
+    IF_A                    aller à l'état 31
+    IF_B                    aller à l'état 32
+    IF_C                    aller à l'état 33
+    INST_IF                 aller à l'état 282
+    BOUCLE_DO_A             aller à l'état 35
+    BOUCLE_DO_B             aller à l'état 36
+    BOUCLE_DO_C             aller à l'état 37
+    BOUCLE_DO               aller à l'état 283
+    BOUCLE_FOR              aller à l'état 284
+    INSTRUCTION_BOUCLE_FOR  aller à l'état 301
+
+
+état 284
+
+  127 INSTRUCTION_BOUCLE_FOR: BOUCLE_FOR . INSTRUCTION_BOUCLE_FOR
+
+    bal_ouv       décalage et aller à l'état 278
+    bal_slch_ouv  décalage et aller à l'état 279
+
+    AFFECTATION             aller à l'état 280
+    INPUT                   aller à l'état 281
+    IF_A                    aller à l'état 31
+    IF_B                    aller à l'état 32
+    IF_C                    aller à l'état 33
+    INST_IF                 aller à l'état 282
+    BOUCLE_DO_A             aller à l'état 35
+    BOUCLE_DO_B             aller à l'état 36
+    BOUCLE_DO_C             aller à l'état 37
+    BOUCLE_DO               aller à l'état 283
+    BOUCLE_FOR              aller à l'état 284
+    INSTRUCTION_BOUCLE_FOR  aller à l'état 302
+
+
+état 285
+
+  121 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until idf bal_fer INSTRUCTION_BOUCLE_FOR .
+
+    $défaut  réduction par utilisation de la règle 121 (BOUCLE_FOR)
+
+
+état 286
+
+  120 BOUCLE_FOR: bal_ouv mc_for idf egal SWITCH_INT mc_until SWITCH_INT bal_fer INSTRUCTION_BOUCLE_FOR .
+
+    $défaut  réduction par utilisation de la règle 120 (BOUCLE_FOR)
+
+
+état 287
+
+   93 INSTRUCTION: bal_ouv mc_output deuxpt OUTPUT . $@4 INSTRUCTION
+
+    $défaut  réduction par utilisation de la règle 92 ($@4)
+
+    $@4  aller à l'état 303
+
+
+état 288
+
+  106 INSTRUCTION_ELSE: bal_ouv mc_output . deuxpt OUTPUT $@5 INSTRUCTION_ELSE
+
+    deuxpt  décalage et aller à l'état 304
+
+
+état 289
+
+  108 INSTRUCTION_ELSE: bal_slch_ouv mc_else . bal_fer
+
+    bal_fer  décalage et aller à l'état 305
+
+
+état 290
+
+  103 INSTRUCTION_ELSE: AFFECTATION INSTRUCTION_ELSE .
+
+    $défaut  réduction par utilisation de la règle 103 (INSTRUCTION_ELSE)
+
+
+état 291
+
+  104 INSTRUCTION_ELSE: INPUT INSTRUCTION_ELSE .
+
+    $défaut  réduction par utilisation de la règle 104 (INSTRUCTION_ELSE)
+
+
+état 292
+
+  107 INSTRUCTION_ELSE: INST_IF INSTRUCTION_ELSE .
+
+    $défaut  réduction par utilisation de la règle 107 (INSTRUCTION_ELSE)
+
+
+état 293
 
    31 DECLARATION_TAB: bal_ouv idf deuxpt cst_unsigned_int bal_slch_fer . $@2 DECLARATION_TAB
 
     $défaut  réduction par utilisation de la règle 30 ($@2)
 
-    $@2  aller à l'état 275
+    $@2  aller à l'état 306
 
 
-état 262
+état 294
 
-   41 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer .
+   42 AFFECTATION: bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer .
 
-    $défaut  réduction par utilisation de la règle 41 (AFFECTATION)
-
-
-état 263
-
-   71 TYPE_EXP: idf cr_ouv cst_unsigned_int cr_fer .
-
-    $défaut  réduction par utilisation de la règle 71 (TYPE_EXP)
+    $défaut  réduction par utilisation de la règle 42 (AFFECTATION)
 
 
-état 264
+état 295
 
-   91 INSTRUCTION: bal_ouv mc_output . deuxpt OUTPUT INSTRUCTION
+   84 ID: idf cr_ouv cst_unsigned_int cr_fer .
 
-    deuxpt  décalage et aller à l'état 276
-
-
-état 265
-
-   89 INSTRUCTION: AFFECTATION INSTRUCTION .
-
-    $défaut  réduction par utilisation de la règle 89 (INSTRUCTION)
+    $défaut  réduction par utilisation de la règle 84 (ID)
 
 
-état 266
+état 296
 
-   90 INSTRUCTION: INPUT INSTRUCTION .
+  124 INSTRUCTION_BOUCLE_FOR: bal_ouv mc_output . deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR
 
-    $défaut  réduction par utilisation de la règle 90 (INSTRUCTION)
-
-
-état 267
-
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv . mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv . mc_then bal_fer bal_slch_ouv mc_if bal_fer
-
-    mc_then  décalage et aller à l'état 277
+    deuxpt  décalage et aller à l'état 307
 
 
-état 268
+état 297
 
-  115 INSTRUCTION_BOUCLE_FOR: bal_ouv mc_output . deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR
+  128 INSTRUCTION_BOUCLE_FOR: bal_slch_ouv mc_for . bal_fer
 
-    deuxpt  décalage et aller à l'état 278
-
-
-état 269
-
-  119 INSTRUCTION_BOUCLE_FOR: bal_slch_ouv mc_for . bal_fer
-
-    bal_fer  décalage et aller à l'état 279
+    bal_fer  décalage et aller à l'état 308
 
 
-état 270
+état 298
 
-  113 INSTRUCTION_BOUCLE_FOR: AFFECTATION INSTRUCTION_BOUCLE_FOR .
+  122 INSTRUCTION_BOUCLE_FOR: AFFECTATION INSTRUCTION_BOUCLE_FOR .
 
-    $défaut  réduction par utilisation de la règle 113 (INSTRUCTION_BOUCLE_FOR)
-
-
-état 271
-
-  114 INSTRUCTION_BOUCLE_FOR: INPUT INSTRUCTION_BOUCLE_FOR .
-
-    $défaut  réduction par utilisation de la règle 114 (INSTRUCTION_BOUCLE_FOR)
+    $défaut  réduction par utilisation de la règle 122 (INSTRUCTION_BOUCLE_FOR)
 
 
-état 272
+état 299
 
-  116 INSTRUCTION_BOUCLE_FOR: INST_IF INSTRUCTION_BOUCLE_FOR .
+  123 INSTRUCTION_BOUCLE_FOR: INPUT INSTRUCTION_BOUCLE_FOR .
 
-    $défaut  réduction par utilisation de la règle 116 (INSTRUCTION_BOUCLE_FOR)
-
-
-état 273
-
-  117 INSTRUCTION_BOUCLE_FOR: BOUCLE_DO INSTRUCTION_BOUCLE_FOR .
-
-    $défaut  réduction par utilisation de la règle 117 (INSTRUCTION_BOUCLE_FOR)
+    $défaut  réduction par utilisation de la règle 123 (INSTRUCTION_BOUCLE_FOR)
 
 
-état 274
+état 300
 
-  118 INSTRUCTION_BOUCLE_FOR: BOUCLE_FOR INSTRUCTION_BOUCLE_FOR .
+  125 INSTRUCTION_BOUCLE_FOR: INST_IF INSTRUCTION_BOUCLE_FOR .
 
-    $défaut  réduction par utilisation de la règle 118 (INSTRUCTION_BOUCLE_FOR)
+    $défaut  réduction par utilisation de la règle 125 (INSTRUCTION_BOUCLE_FOR)
 
 
-état 275
+état 301
+
+  126 INSTRUCTION_BOUCLE_FOR: BOUCLE_DO INSTRUCTION_BOUCLE_FOR .
+
+    $défaut  réduction par utilisation de la règle 126 (INSTRUCTION_BOUCLE_FOR)
+
+
+état 302
+
+  127 INSTRUCTION_BOUCLE_FOR: BOUCLE_FOR INSTRUCTION_BOUCLE_FOR .
+
+    $défaut  réduction par utilisation de la règle 127 (INSTRUCTION_BOUCLE_FOR)
+
+
+état 303
+
+   93 INSTRUCTION: bal_ouv mc_output deuxpt OUTPUT $@4 . INSTRUCTION
+
+    bal_ouv  décalage et aller à l'état 222
+
+    $défaut  réduction par utilisation de la règle 94 (INSTRUCTION)
+
+    AFFECTATION  aller à l'état 223
+    INPUT        aller à l'état 224
+    INSTRUCTION  aller à l'état 309
+
+
+état 304
+
+  106 INSTRUCTION_ELSE: bal_ouv mc_output deuxpt . OUTPUT $@5 INSTRUCTION_ELSE
+
+    chaine_gauche  décalage et aller à l'état 136
+    simple_string  décalage et aller à l'état 137
+
+    OUTPUT  aller à l'état 310
+
+
+état 305
+
+  108 INSTRUCTION_ELSE: bal_slch_ouv mc_else bal_fer .
+
+    $défaut  réduction par utilisation de la règle 108 (INSTRUCTION_ELSE)
+
+
+état 306
 
    31 DECLARATION_TAB: bal_ouv idf deuxpt cst_unsigned_int bal_slch_fer $@2 . DECLARATION_TAB
 
-    bal_ouv       décalage et aller à l'état 154
-    bal_slch_ouv  décalage et aller à l'état 155
+    bal_ouv       décalage et aller à l'état 203
+    bal_slch_ouv  décalage et aller à l'état 204
 
-    DECLARATION_TAB  aller à l'état 280
-
-
-état 276
-
-   91 INSTRUCTION: bal_ouv mc_output deuxpt . OUTPUT INSTRUCTION
-
-    chaine_gauche  décalage et aller à l'état 91
-    simple_string  décalage et aller à l'état 92
-
-    OUTPUT  aller à l'état 281
+    DECLARATION_TAB  aller à l'état 311
 
 
-état 277
+état 307
 
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then . bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then . bal_fer bal_slch_ouv mc_if bal_fer
+  124 INSTRUCTION_BOUCLE_FOR: bal_ouv mc_output deuxpt . OUTPUT INSTRUCTION_BOUCLE_FOR
 
-    bal_fer  décalage et aller à l'état 282
+    chaine_gauche  décalage et aller à l'état 136
+    simple_string  décalage et aller à l'état 137
 
-
-état 278
-
-  115 INSTRUCTION_BOUCLE_FOR: bal_ouv mc_output deuxpt . OUTPUT INSTRUCTION_BOUCLE_FOR
-
-    chaine_gauche  décalage et aller à l'état 91
-    simple_string  décalage et aller à l'état 92
-
-    OUTPUT  aller à l'état 283
+    OUTPUT  aller à l'état 312
 
 
-état 279
+état 308
 
-  119 INSTRUCTION_BOUCLE_FOR: bal_slch_ouv mc_for bal_fer .
+  128 INSTRUCTION_BOUCLE_FOR: bal_slch_ouv mc_for bal_fer .
 
-    $défaut  réduction par utilisation de la règle 119 (INSTRUCTION_BOUCLE_FOR)
+    $défaut  réduction par utilisation de la règle 128 (INSTRUCTION_BOUCLE_FOR)
 
 
-état 280
+état 309
+
+   93 INSTRUCTION: bal_ouv mc_output deuxpt OUTPUT $@4 INSTRUCTION .
+
+    $défaut  réduction par utilisation de la règle 93 (INSTRUCTION)
+
+
+état 310
+
+  106 INSTRUCTION_ELSE: bal_ouv mc_output deuxpt OUTPUT . $@5 INSTRUCTION_ELSE
+
+    $défaut  réduction par utilisation de la règle 105 ($@5)
+
+    $@5  aller à l'état 313
+
+
+état 311
 
    31 DECLARATION_TAB: bal_ouv idf deuxpt cst_unsigned_int bal_slch_fer $@2 DECLARATION_TAB .
 
     $défaut  réduction par utilisation de la règle 31 (DECLARATION_TAB)
 
 
-état 281
+état 312
 
-   91 INSTRUCTION: bal_ouv mc_output deuxpt OUTPUT . INSTRUCTION
+  124 INSTRUCTION_BOUCLE_FOR: bal_ouv mc_output deuxpt OUTPUT . INSTRUCTION_BOUCLE_FOR
 
-    bal_ouv  décalage et aller à l'état 247
+    bal_ouv       décalage et aller à l'état 278
+    bal_slch_ouv  décalage et aller à l'état 279
 
-    $défaut  réduction par utilisation de la règle 92 (INSTRUCTION)
+    AFFECTATION             aller à l'état 280
+    INPUT                   aller à l'état 281
+    IF_A                    aller à l'état 31
+    IF_B                    aller à l'état 32
+    IF_C                    aller à l'état 33
+    INST_IF                 aller à l'état 282
+    BOUCLE_DO_A             aller à l'état 35
+    BOUCLE_DO_B             aller à l'état 36
+    BOUCLE_DO_C             aller à l'état 37
+    BOUCLE_DO               aller à l'état 283
+    BOUCLE_FOR              aller à l'état 284
+    INSTRUCTION_BOUCLE_FOR  aller à l'état 314
 
-    AFFECTATION  aller à l'état 248
-    INPUT        aller à l'état 249
-    INSTRUCTION  aller à l'état 284
 
+état 313
 
-état 282
+  106 INSTRUCTION_ELSE: bal_ouv mc_output deuxpt OUTPUT $@5 . INSTRUCTION_ELSE
 
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer . INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer . bal_slch_ouv mc_if bal_fer
+    bal_ouv       décalage et aller à l'état 268
+    bal_slch_ouv  décalage et aller à l'état 269
 
-    bal_ouv       décalage et aller à l'état 285
-    bal_slch_ouv  décalage et aller à l'état 286
+    AFFECTATION       aller à l'état 270
+    INPUT             aller à l'état 271
+    IF_A              aller à l'état 31
+    IF_B              aller à l'état 32
+    IF_C              aller à l'état 33
+    INST_IF           aller à l'état 272
+    INSTRUCTION_ELSE  aller à l'état 315
 
-    INST_ELSE  aller à l'état 287
 
+état 314
 
-état 283
+  124 INSTRUCTION_BOUCLE_FOR: bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR .
 
-  115 INSTRUCTION_BOUCLE_FOR: bal_ouv mc_output deuxpt OUTPUT . INSTRUCTION_BOUCLE_FOR
+    $défaut  réduction par utilisation de la règle 124 (INSTRUCTION_BOUCLE_FOR)
 
-    bal_ouv       décalage et aller à l'état 252
-    bal_slch_ouv  décalage et aller à l'état 253
 
-    AFFECTATION             aller à l'état 254
-    INPUT                   aller à l'état 255
-    INST_IF                 aller à l'état 256
-    BOUCLE_DO               aller à l'état 257
-    BOUCLE_FOR              aller à l'état 258
-    INSTRUCTION_BOUCLE_FOR  aller à l'état 288
+état 315
 
+  106 INSTRUCTION_ELSE: bal_ouv mc_output deuxpt OUTPUT $@5 INSTRUCTION_ELSE .
 
-état 284
-
-   91 INSTRUCTION: bal_ouv mc_output deuxpt OUTPUT INSTRUCTION .
-
-    $défaut  réduction par utilisation de la règle 91 (INSTRUCTION)
-
-
-état 285
-
-   97 INST_ELSE: bal_ouv . mc_else bal_fer INSTRUCTION_ELSE
-
-    mc_else  décalage et aller à l'état 289
-
-
-état 286
-
-   94 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv . mc_if bal_fer
-
-    mc_if  décalage et aller à l'état 290
-
-
-état 287
-
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE . bal_slch_ouv mc_if bal_fer
-
-    bal_slch_ouv  décalage et aller à l'état 291
-
-
-état 288
-
-  115 INSTRUCTION_BOUCLE_FOR: bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_BOUCLE_FOR .
-
-    $défaut  réduction par utilisation de la règle 115 (INSTRUCTION_BOUCLE_FOR)
-
-
-état 289
-
-   97 INST_ELSE: bal_ouv mc_else . bal_fer INSTRUCTION_ELSE
-
-    bal_fer  décalage et aller à l'état 292
-
-
-état 290
-
-   94 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if . bal_fer
-
-    bal_fer  décalage et aller à l'état 293
-
-
-état 291
-
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv . mc_if bal_fer
-
-    mc_if  décalage et aller à l'état 294
-
-
-état 292
-
-   97 INST_ELSE: bal_ouv mc_else bal_fer . INSTRUCTION_ELSE
-
-    bal_ouv       décalage et aller à l'état 295
-    bal_slch_ouv  décalage et aller à l'état 296
-
-    AFFECTATION       aller à l'état 297
-    INPUT             aller à l'état 298
-    INST_IF           aller à l'état 299
-    INSTRUCTION_ELSE  aller à l'état 300
-
-
-état 293
-
-   94 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer .
-
-    $défaut  réduction par utilisation de la règle 94 (INST_IF)
-
-
-état 294
-
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if . bal_fer
-
-    bal_fer  décalage et aller à l'état 301
-
-
-état 295
-
-   40 AFFECTATION: bal_ouv . mc_aff deuxpt idf vrg X bal_slch_fer
-   41            | bal_ouv . mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer
-   79 INPUT: bal_ouv . mc_input deuxpt idf chaine_gauche SIGNE_FORMATAGE chaine_droite
-   93 INST_IF: bal_ouv . mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer
-   94        | bal_ouv . mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer bal_slch_ouv mc_if bal_fer
-  100 INSTRUCTION_ELSE: bal_ouv . mc_output deuxpt OUTPUT INSTRUCTION_ELSE
-
-    mc_aff     décalage et aller à l'état 44
-    mc_input   décalage et aller à l'état 45
-    mc_output  décalage et aller à l'état 302
-    mc_if      décalage et aller à l'état 47
-
-
-état 296
-
-  102 INSTRUCTION_ELSE: bal_slch_ouv . mc_else bal_fer
-
-    mc_else  décalage et aller à l'état 303
-
-
-état 297
-
-   98 INSTRUCTION_ELSE: AFFECTATION . INSTRUCTION_ELSE
-
-    bal_ouv       décalage et aller à l'état 295
-    bal_slch_ouv  décalage et aller à l'état 296
-
-    AFFECTATION       aller à l'état 297
-    INPUT             aller à l'état 298
-    INST_IF           aller à l'état 299
-    INSTRUCTION_ELSE  aller à l'état 304
-
-
-état 298
-
-   99 INSTRUCTION_ELSE: INPUT . INSTRUCTION_ELSE
-
-    bal_ouv       décalage et aller à l'état 295
-    bal_slch_ouv  décalage et aller à l'état 296
-
-    AFFECTATION       aller à l'état 297
-    INPUT             aller à l'état 298
-    INST_IF           aller à l'état 299
-    INSTRUCTION_ELSE  aller à l'état 305
-
-
-état 299
-
-  101 INSTRUCTION_ELSE: INST_IF . INSTRUCTION_ELSE
-
-    bal_ouv       décalage et aller à l'état 295
-    bal_slch_ouv  décalage et aller à l'état 296
-
-    AFFECTATION       aller à l'état 297
-    INPUT             aller à l'état 298
-    INST_IF           aller à l'état 299
-    INSTRUCTION_ELSE  aller à l'état 306
-
-
-état 300
-
-   97 INST_ELSE: bal_ouv mc_else bal_fer INSTRUCTION_ELSE .
-
-    $défaut  réduction par utilisation de la règle 97 (INST_ELSE)
-
-
-état 301
-
-   93 INST_IF: bal_ouv mc_if deuxpt CONDITION bal_fer bal_ouv mc_then bal_fer INSTRUCTION bal_slch_ouv mc_then bal_fer INST_ELSE bal_slch_ouv mc_if bal_fer .
-
-    $défaut  réduction par utilisation de la règle 93 (INST_IF)
-
-
-état 302
-
-  100 INSTRUCTION_ELSE: bal_ouv mc_output . deuxpt OUTPUT INSTRUCTION_ELSE
-
-    deuxpt  décalage et aller à l'état 307
-
-
-état 303
-
-  102 INSTRUCTION_ELSE: bal_slch_ouv mc_else . bal_fer
-
-    bal_fer  décalage et aller à l'état 308
-
-
-état 304
-
-   98 INSTRUCTION_ELSE: AFFECTATION INSTRUCTION_ELSE .
-
-    $défaut  réduction par utilisation de la règle 98 (INSTRUCTION_ELSE)
-
-
-état 305
-
-   99 INSTRUCTION_ELSE: INPUT INSTRUCTION_ELSE .
-
-    $défaut  réduction par utilisation de la règle 99 (INSTRUCTION_ELSE)
-
-
-état 306
-
-  101 INSTRUCTION_ELSE: INST_IF INSTRUCTION_ELSE .
-
-    $défaut  réduction par utilisation de la règle 101 (INSTRUCTION_ELSE)
-
-
-état 307
-
-  100 INSTRUCTION_ELSE: bal_ouv mc_output deuxpt . OUTPUT INSTRUCTION_ELSE
-
-    chaine_gauche  décalage et aller à l'état 91
-    simple_string  décalage et aller à l'état 92
-
-    OUTPUT  aller à l'état 309
-
-
-état 308
-
-  102 INSTRUCTION_ELSE: bal_slch_ouv mc_else bal_fer .
-
-    $défaut  réduction par utilisation de la règle 102 (INSTRUCTION_ELSE)
-
-
-état 309
-
-  100 INSTRUCTION_ELSE: bal_ouv mc_output deuxpt OUTPUT . INSTRUCTION_ELSE
-
-    bal_ouv       décalage et aller à l'état 295
-    bal_slch_ouv  décalage et aller à l'état 296
-
-    AFFECTATION       aller à l'état 297
-    INPUT             aller à l'état 298
-    INST_IF           aller à l'état 299
-    INSTRUCTION_ELSE  aller à l'état 310
-
-
-état 310
-
-  100 INSTRUCTION_ELSE: bal_ouv mc_output deuxpt OUTPUT INSTRUCTION_ELSE .
-
-    $défaut  réduction par utilisation de la règle 100 (INSTRUCTION_ELSE)
+    $défaut  réduction par utilisation de la règle 106 (INSTRUCTION_ELSE)
