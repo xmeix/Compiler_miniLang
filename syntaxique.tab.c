@@ -594,8 +594,8 @@ static const yytype_uint16 yyrline[] =
      442,   443,   444,   444,   450,   460,   469,   477,   480,   482,
      491,   495,   501,   503,   504,   505,   505,   511,   512,   520,
      529,   535,   542,   549,   550,   551,   551,   558,   559,   560,
-     561,   567,   577,   585,   596,   599,   602,   603,   604,   604,
-     611,   612,   613,   614
+     561,   567,   577,   585,   596,   602,   605,   606,   607,   607,
+     614,   615,   616,   617
 };
 #endif
 
@@ -2656,21 +2656,24 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 596 "syntaxique.y"
     { 
-    if(verificationConditionFor((yyvsp[(1) - (1)].string)) == 1) {(yyval.entier) = getValIdf((yyvsp[(1) - (1)].string)); printf("IDFINT %s = %d \n",(yyvsp[(1) - (1)].string),getValIdf((yyvsp[(1) - (1)].string)));}
+ 
+    if(verificationConditionFor((yyvsp[(1) - (1)].string)) == 1) {   
+      (yyval.entier) = getValIdfInt((yyvsp[(1) - (1)].string));
+    }
    ;}
     break;
 
   case 125:
 
 /* Line 1455 of yacc.c  */
-#line 599 "syntaxique.y"
+#line 602 "syntaxique.y"
     { (yyval.entier) = (yyvsp[(1) - (1)].entier); ;}
     break;
 
   case 128:
 
 /* Line 1455 of yacc.c  */
-#line 604 "syntaxique.y"
+#line 607 "syntaxique.y"
     {
                    InverserChaine(buffer);  
                     printf("%s\n",buffer);
@@ -2683,7 +2686,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 2687 "syntaxique.tab.c"
+#line 2690 "syntaxique.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2895,7 +2898,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 617 "syntaxique.y"
+#line 620 "syntaxique.y"
 
 int main(int argc,char* argv[])
 {   

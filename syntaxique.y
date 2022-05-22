@@ -203,7 +203,7 @@ X: EXPRESSION_ARITH  { sauvValeur=$1; sprintf(sauvVal,"%f",$1);}
 ; 
 /////////////////////////////////////////////////
 
-EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer { $$ =($2) ; } 
+EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer { $$ =($2) ;} 
                  | EXPRESSION_ARITH plus EXPRESSION_ARITH  { $$ = $1 + $3; printf ("+\n");} 
                  | EXPRESSION_ARITH moins EXPRESSION_ARITH { $$ = $1 - $3 ; }
                  | EXPRESSION_ARITH divis EXPRESSION_ARITH { 
@@ -594,10 +594,13 @@ BOUCLE_FOR: BOUCLE_FOR_B bal_fer INSTRUCTION_BOUCLE_FOR{
 }
 
 SWITCHID_INT: idf { 
-    if(verificationConditionFor($1) == 1) {$$ = getValIdf($1); printf("IDFINT %s = %d \n",$1,getValIdf($1));}
-   }
-            | SWITCH_INT { $$ = $1; }
-            ;
+ 
+    if(verificationConditionFor($1) == 1) {   
+      $$ = getValIdfInt($1);
+    }
+}
+| SWITCH_INT { $$ = $1; }
+;
 
 INSTRUCTION_BOUCLE_FOR: AFFECTATION INSTRUCTION_BOUCLE_FOR
                 | INPUT INSTRUCTION_BOUCLE_FOR
