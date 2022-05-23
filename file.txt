@@ -133,6 +133,7 @@
                     </IF>
             <INPUT: idf  " #" />
             <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
-                            
+                            <AFF: Z, 8 + nom_constante_2 - x * 10 /> 
+             
     <WHILE :AND(EGA(x,3),SUP(7,b))/>
     </DO>

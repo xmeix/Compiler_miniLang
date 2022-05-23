@@ -119,11 +119,16 @@ typedef union YYSTYPE
   int entier;
   char* string; 
   float reel;
+  struct
+    {
+     char* chaine;
+     float valeur;
+   }typestruct;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 127 "syntaxique.tab.h"
+#line 132 "syntaxique.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

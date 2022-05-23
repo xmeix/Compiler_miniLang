@@ -37,6 +37,11 @@
   int entier;
   char* string; 
   float reel;
+  struct
+    {
+     char* chaine;
+     float valeur;
+   }typestruct;
 }
 
 %token mc_exl mc_docprogram mc_sub mc_variable mc_body bal_ouv bal_fer bal_slch_fer
@@ -48,13 +53,13 @@
 %token <string>chaine_gauche <string>chaine_droite <string>chaine_outdr <string>simple_string
 %token mc_if mc_then mc_else mc_do mc_while mc_for mc_until
 
-%type <reel> TERM 
-%type <reel> EXPRESSION_ARITH 
+%type <typestruct> TERM 
+%type <typestruct> EXPRESSION_ARITH 
 %type <entier> EXPRESSION_COMPARAISON
 %type <entier> MC_COMPARAISON
 %type <entier> EXPRESSION_LOGIQUE
-%type <entier> EXPRESSIONS
-%type <entier> TYPE_EXP
+%type <typestruct> EXPRESSIONS
+%type <typestruct> TYPE_EXP
 %type <entier> SIGNE_FORMATAGE
 %type <string> ID
 %type <string> OUTPUT
@@ -159,7 +164,7 @@ AFFECTATION:  bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer {
   
                   printf("Val exp affectation 1 =  %f \n",sauvValeur);
                   
-                  if(isItConst($4)!=0 && verificationType($4,typeExp)==0  ){
+                  if(Declared($4)==1 && isItConst($4)!=0 && verificationType($4,typeExp)==0  ){
                     InsertionIdf($4,typeExp,sauvVal);
                     quadr("AFF",sauvVal,"vide",$4); 
                   }
@@ -168,19 +173,22 @@ AFFECTATION:  bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer {
             }
             |bal_ouv mc_aff deuxpt idf cr_ouv cst_unsigned_int cr_fer vrg X bal_slch_fer{
                    
-                   if(categDeclaredAs($4,"tableau")==0){ 
+                   if( Declared($4)==1 && categDeclaredAs($4,"tableau")==0){ 
                      printf("Val exp affectation2 =  %f \n",sauvValeur);
                      
                      if(verificationType($4,typeExp)==0){
                        
                        InsertionTab($4,$6,sauvVal);
-                       char str[100];
+                       char str[100] ;
+                       char str2[100];
+                       str[0] = '\0';
+                        printf("%s\n",str);
                        strcat(str,$4);
                         strcat(str,"[");
-                        sprintf(sauvVal,"%d",$6);
-                        strcat(str,sauvVal);
+                        sprintf(str2,"%d",$6);
+                        strcat(str,str2);
                         strcat(str,"]");
-                       quadr("AFF",sauvVal,"vide",str);
+                       quadr("AFF",sauvVal,"vide",str); 
                      }
                      
                     
@@ -188,7 +196,7 @@ AFFECTATION:  bal_ouv mc_aff deuxpt idf vrg X bal_slch_fer {
             }
             ;
 
-X: EXPRESSION_ARITH  { sauvValeur=$1; sprintf(sauvVal,"%f",$1);}
+X: EXPRESSION_ARITH  { sauvValeur=$1.valeur; sprintf(sauvVal,"%f",$1.valeur); }
  | EXPRESSION_COMPARAISON { 
       typeExp = 3;  
       if($1 == 1) strcpy(sauvVal,"TRUE");
@@ -203,120 +211,201 @@ X: EXPRESSION_ARITH  { sauvValeur=$1; sprintf(sauvVal,"%f",$1);}
 ; 
 /////////////////////////////////////////////////
 
-EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer { $$ =($2) ;} 
-                 | EXPRESSION_ARITH plus EXPRESSION_ARITH  { $$ = $1 + $3; printf ("+\n");} 
-                 | EXPRESSION_ARITH moins EXPRESSION_ARITH { $$ = $1 - $3 ; }
+EXPRESSION_ARITH: par_ouv EXPRESSION_ARITH par_fer { $$.valeur =($2.valeur); sprintf($$.chaine,"%f",$2.valeur);  } 
+                 | EXPRESSION_ARITH plus EXPRESSION_ARITH  { $$.valeur = $1.valeur + $3.valeur; 
+                                                            char str[100];  
+                                                            sprintf(str,"%f",$$.valeur); 
+                                                            $$.chaine=strdup(str); 
+                                                            quadr("+",$1.chaine,$3.chaine,$$.chaine);
+                                                             } 
+                 | EXPRESSION_ARITH moins EXPRESSION_ARITH { 
+                                                              
+                                                            $$.valeur = $1.valeur - $3.valeur; 
+                                                            char str[100];  
+                                                            sprintf(str,"%f",$$.valeur); 
+                                                            $$.chaine=strdup(str); 
+                                                            quadr("-",$1.chaine,$3.chaine,$$.chaine);  }
                  | EXPRESSION_ARITH divis EXPRESSION_ARITH { 
-                        if( $3 != 0 ) $$ = $1 / $3 ; 
-                        else printf("Erreur semantique : division par zero \n");                                  
+                        if( ($3.valeur) != 0 ) $$.valeur = $1.valeur / $3.valeur ; 
+                        else {printf("Erreur semantique : division par zero \n"); exit(0); }
+                         
+                                                            char str[100];  
+                                                            sprintf(str,"%f",$$.valeur); 
+                                                            $$.chaine=strdup(str); 
+                                                            quadr("/",$1.chaine,$3.chaine,$$.chaine);                            
                                                             }
-                 | EXPRESSION_ARITH mult EXPRESSION_ARITH  { $$ = $1 * $3 ;}
-                 | TERM { $$ = $1; }
+                 | EXPRESSION_ARITH mult EXPRESSION_ARITH  { $$.valeur = $1.valeur * $3.valeur ;
+                                                            char str[100];  
+                                                            sprintf(str,"%f",$$.valeur); 
+                                                            $$.chaine=strdup(str); 
+                                                            quadr("*",$1.chaine,$3.chaine,$$.chaine);
+                 }
+                 | TERM { $$.valeur = $1.valeur;  }
                 ; 
-TERM:  par_ouv cst_int_neg par_fer { $$ = (float)$2; }
-     | cst_unsigned_int { $$ = (float)$1; }
-     | cst_float { $$ = $1;  typeExp=1; }
-     | idf { 
-       printf("idf = %s\n",$1);
-       sauvState=typeEntite($1);
-       if(sauvState==1) typeExp=1;
-       getValueIdf($1,res); 
-       sauvValeur=atof(res);
-       $$=atof(res);
+TERM:  par_ouv cst_int_neg par_fer { $$.valeur = (float)$2; /*sprintf($$.chaine,"%f",(float)$2);*/ printf("%d\n",$$.valeur); }
+     | cst_unsigned_int { $$.valeur = (float)$1; char str[100];  sprintf(str,"%f",$$.valeur); $$.chaine=strdup(str);printf("%f\n",$$.valeur);}
+     | cst_float { $$.valeur = $1;  typeExp=1;   }
+     | idf {  
+        if(Declared($1)==1 && HasValue($1,-1)==1 )
+       {
+          sauvState=typeEntite($1);
+          if(sauvState==1) typeExp=1;
+          getValueIdf($1,res); 
+          sauvValeur=atof(res);
+          $$.valeur=atof(res);
+          $$.chaine=$1;
+         }
      }
      | idf cr_ouv cst_unsigned_int cr_fer { 
-       
-       sauvState=typeEntite($1);
-       if(sauvState==1) typeExp=1;
-       sauvValeur=getValueTab($1,$3);
-       $$=sauvValeur;
+       if(Declared($1)==1 && HasValue($1,$3)==1 )
+       {
+          sauvState=typeEntite($1);
+          if(sauvState==1) typeExp=1;
+          getValueTab($1,$3,res);
+          printf("----------------------%s\n",res);
+          $$.valeur=atof(res); 
+                      char str[100] ;
+                       char str2[100];
+                       str[0] = '\0'; 
+                       strcat(str,$1);
+                        strcat(str,"[");
+                        sprintf(str2,"%d",$3);
+                        strcat(str,str2);
+                        strcat(str,"]");  
+                      $$.chaine=str; 
+       }
      }
      ; 
      
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EXPRESSION_LOGIQUE:OpLog par_ouv EXPRESSIONS par_fer {
-                    $$ = $3; 
-
-                    if($3 == 0)  quadr($1,"FALSE","vide","vide");
-                    else quadr($1,"TRUE","vide","vide");
-                   
+                    $$ = $3.valeur; 
+ 
                   } 
                   | not par_ouv  TYPE_EXP par_fer{
-                    $$ = !$3; 
+                    $$ = !$3.valeur; 
 
-                    if($3 != 0)  quadr("NOT","FALSE","vide","vide");
-                    else quadr("NOT","TRUE","vide","vide");
+                    if($3.valeur != 0)  quadr("NOT",$3.chaine,"vide","FALSE");//false
+                    else quadr("NOT",$3.chaine,"vide","TRUE");//true
                   }
                   ; 
 
 OpLog : and { valLog = 0; $$ = "AND"; } 
       | or { valLog = 1;  $$ = "OR"; } 
       ;
-EXPRESSIONS:  TYPE_EXP vrg EXPRESSIONS {
+EXPRESSIONS:  TYPE_EXP vrg EXPRESSIONS { 
+                    
+                    
             if(valLog == 0){
-                  $$ = $1 && $3;
+                  $$.valeur = $1.valeur && $3.valeur;
+                  
+                    if($$.valeur == 0)  $$.chaine=strdup("FALSE");
+                    else $$.chaine=strdup("TRUE"); 
+                   quadr("AND",$1.chaine,$3.chaine,$$.chaine);
             }else if(valLog == 1){
-                  $$ = $1 || $3 ;
+                  $$.valeur = $1.valeur || $3.valeur ;
+                  
+                    if($$.valeur == 0)  $$.chaine=strdup("FALSE");
+                    else $$.chaine=strdup("TRUE"); 
+                   quadr("OR",$1.chaine,$3.chaine,$$.chaine);
            }
-            }
+                   
+            } 
             | TYPE_EXP vrg TYPE_EXP {
+                    
             if(valLog == 0){
-                  $$ = $1 && $3;
+                  $$.valeur = $1.valeur && $3.valeur;
+                   
+                    if($$.valeur == 0)  $$.chaine=strdup("FALSE");
+                    else $$.chaine=strdup("TRUE"); 
+                   quadr("AND",$1.chaine,$3.chaine,$$.chaine);
             }else if(valLog == 1){
-                  $$ = $1 || $3 ;
+                  $$.valeur = $1.valeur || $3.valeur ;
+                     if($$.valeur == 0)  $$.chaine=strdup("FALSE");
+                    else $$.chaine=strdup("TRUE"); 
+                   quadr("OR",$1.chaine,$3.chaine,$$.chaine);
            }
             };
 
 
 TYPE_EXP : EXPRESSION_LOGIQUE {
-          $$ = $1; 
+          $$.valeur = $1; //1 true 0 false
+          
+           if($1 == 0)  $$.chaine=strdup("FALSE");
+           else $$.chaine=strdup("TRUE"); 
          } 
          | EXPRESSION_COMPARAISON { 
-          $$ = $1;
+           $$.valeur = $1; //1 true 0 false
+            
+           if($1 == 0)  $$.chaine=strdup("FALSE");
+           else $$.chaine=strdup("TRUE"); 
          }
          | cst_bool {
-            if(strcmp($1,"FALSE")==0) $$ = 0; //false
-            else if(strcmp($1,"TRUE")==0) $$ = 1; //true
+
+
+            if(strcmp($1,"FALSE")==0){
+               $$.valeur = 0; 
+               $$.chaine = strdup("FALSE");
+               }//false
+            else if(strcmp($1,"TRUE")==0){
+               $$.valeur = 1;
+               $$.chaine = strdup("TRUE");
+               } //true
          } 
          | idf { 
-            
-            if(ValueIdfBol($1)==1) $$ = 0; //false
-            else if(ValueIdfBol($1)==0) $$ = 1; //true    
+            if(Declared($1)==1 && HasValue($1,-1)==1){
+               
+                $$.valeur = ValueIdfBol($1);
+                 $$.chaine = strdup($1); 
+            }  
          }
          
          | idf cr_ouv cst_unsigned_int cr_fer{
            
-          
-            if(ValueTabBol($1,$3)==1) $$ = 0; //false
-            else if(ValueTabBol($1,$3)==0) $$ = 1; //true 
-            
+          if(Declared($1)==1 && HasValue($1,$3)==1){ 
+                      char str[100] ;
+                       char str2[100];
+                       str[0] = '\0'; 
+                       strcat(str,$1);
+                       strcat(str,"[");
+                       sprintf(str2,"%d",$3);
+                       strcat(str,str2);
+                       strcat(str,"]");  
+                       $$.chaine=str;
+                       $$.valeur = ValueTabBol($1,$3);
+            }
          }  
          ;
 /////////////////////////////////////////////////
 EXPRESSION_COMPARAISON: MC_COMPARAISON par_ouv EXPRESSION_ARITH vrg EXPRESSION_ARITH par_fer{
    
-  sprintf(val1,"%f",(float)$3);
-  sprintf(val2,"%f",(float)$5);
+  // sprintf(val1,"%f",(float)$3);
+  // sprintf(val2,"%f",(float)$5);
   sprintf(valSigne,"%d",$1);
-  resComp=resultatComparaison(val1,val2,valSigne);
-  //printf("Resultat: %d \n",resComp);
-  if(resComp == 0){
+  
+    char ch1[100], ch2[100];
+    sprintf(ch1,"%f",$3.valeur);
+    sprintf(ch2,"%f",$5.valeur);
+    resComp=resultatComparaison(ch1,ch2,valSigne);
+  //  printf("-----------------------------chaines : %s , %s \n",$3.chaine,$5.chaine);
+  //   printf("----------------------------valeurs : %f , %f \n",$3.valeur,$5.valeur);
+  // printf("-------------------------- %d Resultat: %d \n",$1,resComp);
+  if(resComp == 1){
     $$=1; //TRUE
-  }else if(resComp ==1 ){
+  }else
     $$=0; //FALSE
-  }
 
   char str[100];
-  if(resComp == 0 ) strcpy(str,"TRUE");
+  if(resComp == 1 ) strcpy(str,"TRUE");
   else strcpy(str,"FALSE");
 
-  if($1 == 0) quadr("SUP",str,"vide","vide");
-  else if($1 == 1) quadr("SUPEG",str,"vide","vide");
-  else if($1 == 2) quadr("INFEG",str,"vide","vide");
-  else if($1 == 3) quadr("INF",str,"vide","vide");
-  else if($1 == 4) quadr("EGA",str,"vide","vide");
-  else if($1 == 5) quadr("DIF",str,"vide","vide");
+  if($1 == 0) quadr("SUP",$3.chaine,$5.chaine,str);
+  else if($1 == 1) quadr("SUPEG",$3.chaine,$5.chaine,str);
+  else if($1 == 2) quadr("INFEG",$3.chaine,$5.chaine,str);
+  else if($1 == 3) quadr("INF",$3.chaine,$5.chaine,str);
+  else if($1 == 4) quadr("EGA",$3.chaine,$5.chaine,str);
+  else if($1 == 5) quadr("DIF",$3.chaine,$5.chaine,str);
 
 
 

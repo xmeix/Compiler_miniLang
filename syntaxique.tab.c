@@ -213,11 +213,16 @@ typedef union YYSTYPE
   int entier;
   char* string; 
   float reel;
+  struct
+    {
+     char* chaine;
+     float valeur;
+   }typestruct;
 
 
 
 /* Line 214 of yacc.c  */
-#line 221 "syntaxique.tab.c"
+#line 226 "syntaxique.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -229,7 +234,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 233 "syntaxique.tab.c"
+#line 238 "syntaxique.tab.c"
 
 #ifdef short
 # undef short
@@ -582,20 +587,20 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    73,    73,    76,    79,    82,    96,    97,    98,   101,
-     101,   104,   105,   106,   108,   111,   112,   113,   114,   115,
-     117,   118,   119,   122,   125,   131,   132,   133,   134,   135,
-     138,   138,   139,   142,   143,   144,   144,   150,   151,   152,
-     153,   158,   169,   191,   192,   197,   200,   201,   202,   206,
-     207,   208,   209,   213,   214,   216,   217,   218,   219,   227,
-     238,   245,   253,   254,   256,   263,   272,   275,   278,   282,
-     288,   297,   325,   326,   327,   328,   329,   330,   335,   343,
-     379,   389,   417,   431,   432,   435,   436,   437,   438,   439,
-     442,   443,   444,   444,   450,   460,   469,   477,   480,   482,
-     491,   495,   501,   503,   504,   505,   505,   511,   512,   520,
-     529,   535,   542,   549,   550,   551,   551,   558,   559,   560,
-     561,   567,   577,   585,   596,   602,   605,   606,   607,   607,
-     614,   615,   616,   617
+       0,    78,    78,    81,    84,    87,   101,   102,   103,   106,
+     106,   109,   110,   111,   113,   116,   117,   118,   119,   120,
+     122,   123,   124,   127,   130,   136,   137,   138,   139,   140,
+     143,   143,   144,   147,   148,   149,   149,   155,   156,   157,
+     158,   163,   174,   199,   200,   205,   208,   209,   210,   214,
+     215,   221,   228,   237,   243,   245,   246,   247,   248,   259,
+     282,   286,   294,   295,   297,   315,   332,   338,   344,   356,
+     364,   381,   414,   415,   416,   417,   418,   419,   424,   432,
+     468,   478,   506,   520,   521,   524,   525,   526,   527,   528,
+     531,   532,   533,   533,   539,   549,   558,   566,   569,   571,
+     580,   584,   590,   592,   593,   594,   594,   600,   601,   609,
+     618,   624,   631,   638,   639,   640,   640,   647,   648,   649,
+     650,   656,   666,   674,   685,   691,   694,   695,   696,   696,
+     703,   704,   705,   706
 };
 #endif
 
@@ -1738,7 +1743,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 74 "syntaxique.y"
+#line 79 "syntaxique.y"
     {printf("programme syntaxiquement correct");
                                 YYACCEPT;;}
     break;
@@ -1746,7 +1751,7 @@ yyreduce:
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 77 "syntaxique.y"
+#line 82 "syntaxique.y"
     {printf("programme syntaxiquement correct");
                                 YYACCEPT;;}
     break;
@@ -1754,7 +1759,7 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 80 "syntaxique.y"
+#line 85 "syntaxique.y"
     {printf("programme syntaxiquement correct");
                                 YYACCEPT;;}
     break;
@@ -1762,7 +1767,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 83 "syntaxique.y"
+#line 88 "syntaxique.y"
     {printf("programme syntaxiquement correct");
                                 YYACCEPT;;}
     break;
@@ -1770,84 +1775,84 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 98 "syntaxique.y"
+#line 103 "syntaxique.y"
     { sauvCateg = 0;;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 101 "syntaxique.y"
+#line 106 "syntaxique.y"
     { sauvCateg = 0; ;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 106 "syntaxique.y"
+#line 111 "syntaxique.y"
     { sauvCateg = 1;;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 108 "syntaxique.y"
+#line 113 "syntaxique.y"
     { verificationInsertion((yyvsp[(1) - (5)].string),sauvCateg,sauvType,sauvVal,0,sauvState);;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 112 "syntaxique.y"
+#line 117 "syntaxique.y"
     {sprintf(sauvVal,"%f",(yyvsp[(1) - (1)].reel)); sauvState=1; strcpy(sauvType,"FLT");;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 113 "syntaxique.y"
+#line 118 "syntaxique.y"
     {strcpy(sauvVal,(yyvsp[(1) - (1)].string)); sauvState=2; strcpy(sauvType,"BOL");;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 114 "syntaxique.y"
+#line 119 "syntaxique.y"
     {strcpy(sauvVal,(yyvsp[(1) - (1)].string));   sauvState=2; strcpy(sauvType,"CHR");;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 115 "syntaxique.y"
+#line 120 "syntaxique.y"
     {strcpy(sauvVal,(yyvsp[(1) - (1)].string)); sauvState=2; strcpy(sauvType,"STR");;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 117 "syntaxique.y"
+#line 122 "syntaxique.y"
     {sprintf(sauvVal,"%d",(yyvsp[(2) - (3)].entier)); sauvState=0; strcpy(sauvType,"INT"); (yyval.entier) = (yyvsp[(2) - (3)].entier);;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 118 "syntaxique.y"
+#line 123 "syntaxique.y"
     {sprintf(sauvVal,"%d",(yyvsp[(2) - (3)].entier)); sauvState=0; strcpy(sauvType,"INT"); (yyval.entier) = (yyvsp[(2) - (3)].entier);;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 119 "syntaxique.y"
+#line 124 "syntaxique.y"
     {sprintf(sauvVal,"%d",(yyvsp[(1) - (1)].entier)); sauvState=0; strcpy(sauvType,"INT"); (yyval.entier) = (yyvsp[(1) - (1)].entier);;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 122 "syntaxique.y"
+#line 127 "syntaxique.y"
     {
                     verificationInsertion((yyvsp[(1) - (3)].string),sauvCateg,sauvType,"",0,3);
                   ;}
@@ -1856,7 +1861,7 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 125 "syntaxique.y"
+#line 130 "syntaxique.y"
     {
                     verificationInsertion((yyvsp[(1) - (5)].string),sauvCateg,sauvType,"",0,3);
                   ;}
@@ -1865,49 +1870,49 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 131 "syntaxique.y"
+#line 136 "syntaxique.y"
     {strcpy(sauvType,"INT");;}
     break;
 
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 132 "syntaxique.y"
+#line 137 "syntaxique.y"
     {strcpy(sauvType,"FLT");;}
     break;
 
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 133 "syntaxique.y"
+#line 138 "syntaxique.y"
     {strcpy(sauvType,"CHR");;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 134 "syntaxique.y"
+#line 139 "syntaxique.y"
     {strcpy(sauvType,"STR");;}
     break;
 
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 135 "syntaxique.y"
+#line 140 "syntaxique.y"
     {strcpy(sauvType,"BOL");;}
     break;
 
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 138 "syntaxique.y"
+#line 143 "syntaxique.y"
     { insertion((yyvsp[(2) - (5)].string),"tableau",sauvType,"",(yyvsp[(4) - (5)].entier),3); ;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 144 "syntaxique.y"
+#line 149 "syntaxique.y"
     {
               InverserChaine(buffer);  
               printf("%s\n",buffer);
@@ -1919,12 +1924,12 @@ yyreduce:
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 158 "syntaxique.y"
+#line 163 "syntaxique.y"
     {
   
                   printf("Val exp affectation 1 =  %f \n",sauvValeur);
                   
-                  if(isItConst((yyvsp[(4) - (7)].string))!=0 && verificationType((yyvsp[(4) - (7)].string),typeExp)==0  ){
+                  if(Declared((yyvsp[(4) - (7)].string))==1 && isItConst((yyvsp[(4) - (7)].string))!=0 && verificationType((yyvsp[(4) - (7)].string),typeExp)==0  ){
                     InsertionIdf((yyvsp[(4) - (7)].string),typeExp,sauvVal);
                     quadr("AFF",sauvVal,"vide",(yyvsp[(4) - (7)].string)); 
                   }
@@ -1936,22 +1941,25 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 169 "syntaxique.y"
+#line 174 "syntaxique.y"
     {
                    
-                   if(categDeclaredAs((yyvsp[(4) - (10)].string),"tableau")==0){ 
+                   if( Declared((yyvsp[(4) - (10)].string))==1 && categDeclaredAs((yyvsp[(4) - (10)].string),"tableau")==0){ 
                      printf("Val exp affectation2 =  %f \n",sauvValeur);
                      
                      if(verificationType((yyvsp[(4) - (10)].string),typeExp)==0){
                        
                        InsertionTab((yyvsp[(4) - (10)].string),(yyvsp[(6) - (10)].entier),sauvVal);
-                       char str[100];
+                       char str[100] ;
+                       char str2[100];
+                       str[0] = '\0';
+                        printf("%s\n",str);
                        strcat(str,(yyvsp[(4) - (10)].string));
                         strcat(str,"[");
-                        sprintf(sauvVal,"%d",(yyvsp[(6) - (10)].entier));
-                        strcat(str,sauvVal);
+                        sprintf(str2,"%d",(yyvsp[(6) - (10)].entier));
+                        strcat(str,str2);
                         strcat(str,"]");
-                       quadr("AFF",sauvVal,"vide",str);
+                       quadr("AFF",sauvVal,"vide",str); 
                      }
                      
                     
@@ -1962,14 +1970,14 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 191 "syntaxique.y"
-    { sauvValeur=(yyvsp[(1) - (1)].reel); sprintf(sauvVal,"%f",(yyvsp[(1) - (1)].reel));;}
+#line 199 "syntaxique.y"
+    { sauvValeur=(yyvsp[(1) - (1)].typestruct).valeur; sprintf(sauvVal,"%f",(yyvsp[(1) - (1)].typestruct).valeur); ;}
     break;
 
   case 44:
 
 /* Line 1455 of yacc.c  */
-#line 192 "syntaxique.y"
+#line 200 "syntaxique.y"
     { 
       typeExp = 3;  
       if((yyvsp[(1) - (1)].entier) == 1) strcpy(sauvVal,"TRUE");
@@ -1980,7 +1988,7 @@ yyreduce:
   case 45:
 
 /* Line 1455 of yacc.c  */
-#line 197 "syntaxique.y"
+#line 205 "syntaxique.y"
     { typeExp = 3; 
       if((yyvsp[(1) - (1)].entier) == 1) strcpy(sauvVal,"TRUE");
       else if((yyvsp[(1) - (1)].entier) == 0) strcpy(sauvVal,"FALSE");  ;}
@@ -1989,178 +1997,230 @@ yyreduce:
   case 46:
 
 /* Line 1455 of yacc.c  */
-#line 200 "syntaxique.y"
+#line 208 "syntaxique.y"
     {strcpy(sauvType,"STR"); strcpy(sauvVal,(yyvsp[(1) - (1)].string));  typeExp = 2;;}
     break;
 
   case 47:
 
 /* Line 1455 of yacc.c  */
-#line 201 "syntaxique.y"
+#line 209 "syntaxique.y"
     {strcpy(sauvType,"CHR"); strcpy(sauvVal,(yyvsp[(1) - (1)].string)); typeExp = 2;;}
     break;
 
   case 48:
 
 /* Line 1455 of yacc.c  */
-#line 202 "syntaxique.y"
+#line 210 "syntaxique.y"
     {strcpy(sauvType,"BOL"); strcpy(sauvVal,(yyvsp[(1) - (1)].string)); typeExp = 3;;}
     break;
 
   case 49:
 
 /* Line 1455 of yacc.c  */
-#line 206 "syntaxique.y"
-    { (yyval.reel) =((yyvsp[(2) - (3)].reel)) ; ;}
+#line 214 "syntaxique.y"
+    { (yyval.typestruct).valeur =((yyvsp[(2) - (3)].typestruct).valeur); sprintf((yyval.typestruct).chaine,"%f",(yyvsp[(2) - (3)].typestruct).valeur);  ;}
     break;
 
   case 50:
 
 /* Line 1455 of yacc.c  */
-#line 207 "syntaxique.y"
-    { (yyval.reel) = (yyvsp[(1) - (3)].reel) + (yyvsp[(3) - (3)].reel); printf ("+\n");;}
+#line 215 "syntaxique.y"
+    { (yyval.typestruct).valeur = (yyvsp[(1) - (3)].typestruct).valeur + (yyvsp[(3) - (3)].typestruct).valeur; 
+                                                            char str[100];  
+                                                            sprintf(str,"%f",(yyval.typestruct).valeur); 
+                                                            (yyval.typestruct).chaine=strdup(str); 
+                                                            quadr("+",(yyvsp[(1) - (3)].typestruct).chaine,(yyvsp[(3) - (3)].typestruct).chaine,(yyval.typestruct).chaine);
+                                                             ;}
     break;
 
   case 51:
 
 /* Line 1455 of yacc.c  */
-#line 208 "syntaxique.y"
-    { (yyval.reel) = (yyvsp[(1) - (3)].reel) - (yyvsp[(3) - (3)].reel) ; ;}
+#line 221 "syntaxique.y"
+    { 
+                                                              
+                                                            (yyval.typestruct).valeur = (yyvsp[(1) - (3)].typestruct).valeur - (yyvsp[(3) - (3)].typestruct).valeur; 
+                                                            char str[100];  
+                                                            sprintf(str,"%f",(yyval.typestruct).valeur); 
+                                                            (yyval.typestruct).chaine=strdup(str); 
+                                                            quadr("-",(yyvsp[(1) - (3)].typestruct).chaine,(yyvsp[(3) - (3)].typestruct).chaine,(yyval.typestruct).chaine);  ;}
     break;
 
   case 52:
 
 /* Line 1455 of yacc.c  */
-#line 209 "syntaxique.y"
+#line 228 "syntaxique.y"
     { 
-                        if( (yyvsp[(3) - (3)].reel) != 0 ) (yyval.reel) = (yyvsp[(1) - (3)].reel) / (yyvsp[(3) - (3)].reel) ; 
-                        else printf("Erreur semantique : division par zero \n");                                  
+                        if( ((yyvsp[(3) - (3)].typestruct).valeur) != 0 ) (yyval.typestruct).valeur = (yyvsp[(1) - (3)].typestruct).valeur / (yyvsp[(3) - (3)].typestruct).valeur ; 
+                        else {printf("Erreur semantique : division par zero \n"); exit(0); }
+                         
+                                                            char str[100];  
+                                                            sprintf(str,"%f",(yyval.typestruct).valeur); 
+                                                            (yyval.typestruct).chaine=strdup(str); 
+                                                            quadr("/",(yyvsp[(1) - (3)].typestruct).chaine,(yyvsp[(3) - (3)].typestruct).chaine,(yyval.typestruct).chaine);                            
                                                             ;}
     break;
 
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 213 "syntaxique.y"
-    { (yyval.reel) = (yyvsp[(1) - (3)].reel) * (yyvsp[(3) - (3)].reel) ;;}
+#line 237 "syntaxique.y"
+    { (yyval.typestruct).valeur = (yyvsp[(1) - (3)].typestruct).valeur * (yyvsp[(3) - (3)].typestruct).valeur ;
+                                                            char str[100];  
+                                                            sprintf(str,"%f",(yyval.typestruct).valeur); 
+                                                            (yyval.typestruct).chaine=strdup(str); 
+                                                            quadr("*",(yyvsp[(1) - (3)].typestruct).chaine,(yyvsp[(3) - (3)].typestruct).chaine,(yyval.typestruct).chaine);
+                 ;}
     break;
 
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 214 "syntaxique.y"
-    { (yyval.reel) = (yyvsp[(1) - (1)].reel); ;}
+#line 243 "syntaxique.y"
+    { (yyval.typestruct).valeur = (yyvsp[(1) - (1)].typestruct).valeur;  ;}
     break;
 
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 216 "syntaxique.y"
-    { (yyval.reel) = (float)(yyvsp[(2) - (3)].entier); ;}
+#line 245 "syntaxique.y"
+    { (yyval.typestruct).valeur = (float)(yyvsp[(2) - (3)].entier); /*sprintf($$.chaine,"%f",(float)$2);*/ printf("%d\n",(yyval.typestruct).valeur); ;}
     break;
 
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 217 "syntaxique.y"
-    { (yyval.reel) = (float)(yyvsp[(1) - (1)].entier); ;}
+#line 246 "syntaxique.y"
+    { (yyval.typestruct).valeur = (float)(yyvsp[(1) - (1)].entier); char str[100];  sprintf(str,"%f",(yyval.typestruct).valeur); (yyval.typestruct).chaine=strdup(str);printf("%f\n",(yyval.typestruct).valeur);;}
     break;
 
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 218 "syntaxique.y"
-    { (yyval.reel) = (yyvsp[(1) - (1)].reel);  typeExp=1; ;}
+#line 247 "syntaxique.y"
+    { (yyval.typestruct).valeur = (yyvsp[(1) - (1)].reel);  typeExp=1;   ;}
     break;
 
   case 58:
 
 /* Line 1455 of yacc.c  */
-#line 219 "syntaxique.y"
-    { 
-       printf("idf = %s\n",(yyvsp[(1) - (1)].string));
-       sauvState=typeEntite((yyvsp[(1) - (1)].string));
-       if(sauvState==1) typeExp=1;
-       getValueIdf((yyvsp[(1) - (1)].string),res); 
-       sauvValeur=atof(res);
-       (yyval.reel)=atof(res);
+#line 248 "syntaxique.y"
+    {  
+        if(Declared((yyvsp[(1) - (1)].string))==1 && HasValue((yyvsp[(1) - (1)].string),-1)==1 )
+       {
+          sauvState=typeEntite((yyvsp[(1) - (1)].string));
+          if(sauvState==1) typeExp=1;
+          getValueIdf((yyvsp[(1) - (1)].string),res); 
+          sauvValeur=atof(res);
+          (yyval.typestruct).valeur=atof(res);
+          (yyval.typestruct).chaine=(yyvsp[(1) - (1)].string);
+         }
      ;}
     break;
 
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 227 "syntaxique.y"
+#line 259 "syntaxique.y"
     { 
-       
-       sauvState=typeEntite((yyvsp[(1) - (4)].string));
-       if(sauvState==1) typeExp=1;
-       sauvValeur=getValueTab((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].entier));
-       (yyval.reel)=sauvValeur;
+       if(Declared((yyvsp[(1) - (4)].string))==1 && HasValue((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].entier))==1 )
+       {
+          sauvState=typeEntite((yyvsp[(1) - (4)].string));
+          if(sauvState==1) typeExp=1;
+          getValueTab((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].entier),res);
+          printf("----------------------%s\n",res);
+          (yyval.typestruct).valeur=atof(res); 
+                      char str[100] ;
+                       char str2[100];
+                       str[0] = '\0'; 
+                       strcat(str,(yyvsp[(1) - (4)].string));
+                        strcat(str,"[");
+                        sprintf(str2,"%d",(yyvsp[(3) - (4)].entier));
+                        strcat(str,str2);
+                        strcat(str,"]");  
+                      (yyval.typestruct).chaine=str; 
+       }
      ;}
     break;
 
   case 60:
 
 /* Line 1455 of yacc.c  */
-#line 238 "syntaxique.y"
+#line 282 "syntaxique.y"
     {
-                    (yyval.entier) = (yyvsp[(3) - (4)].entier); 
-
-                    if((yyvsp[(3) - (4)].entier) == 0)  quadr((yyvsp[(1) - (4)].string),"FALSE","vide","vide");
-                    else quadr((yyvsp[(1) - (4)].string),"TRUE","vide","vide");
-                   
+                    (yyval.entier) = (yyvsp[(3) - (4)].typestruct).valeur; 
+ 
                   ;}
     break;
 
   case 61:
 
 /* Line 1455 of yacc.c  */
-#line 245 "syntaxique.y"
+#line 286 "syntaxique.y"
     {
-                    (yyval.entier) = !(yyvsp[(3) - (4)].entier); 
+                    (yyval.entier) = !(yyvsp[(3) - (4)].typestruct).valeur; 
 
-                    if((yyvsp[(3) - (4)].entier) != 0)  quadr("NOT","FALSE","vide","vide");
-                    else quadr("NOT","TRUE","vide","vide");
+                    if((yyvsp[(3) - (4)].typestruct).valeur != 0)  quadr("NOT",(yyvsp[(3) - (4)].typestruct).chaine,"vide","FALSE");//false
+                    else quadr("NOT",(yyvsp[(3) - (4)].typestruct).chaine,"vide","TRUE");//true
                   ;}
     break;
 
   case 62:
 
 /* Line 1455 of yacc.c  */
-#line 253 "syntaxique.y"
+#line 294 "syntaxique.y"
     { valLog = 0; (yyval.string) = "AND"; ;}
     break;
 
   case 63:
 
 /* Line 1455 of yacc.c  */
-#line 254 "syntaxique.y"
+#line 295 "syntaxique.y"
     { valLog = 1;  (yyval.string) = "OR"; ;}
     break;
 
   case 64:
 
 /* Line 1455 of yacc.c  */
-#line 256 "syntaxique.y"
-    {
+#line 297 "syntaxique.y"
+    { 
+                    
+                    
             if(valLog == 0){
-                  (yyval.entier) = (yyvsp[(1) - (3)].entier) && (yyvsp[(3) - (3)].entier);
+                  (yyval.typestruct).valeur = (yyvsp[(1) - (3)].typestruct).valeur && (yyvsp[(3) - (3)].typestruct).valeur;
+                  
+                    if((yyval.typestruct).valeur == 0)  (yyval.typestruct).chaine=strdup("FALSE");
+                    else (yyval.typestruct).chaine=strdup("TRUE"); 
+                   quadr("AND",(yyvsp[(1) - (3)].typestruct).chaine,(yyvsp[(3) - (3)].typestruct).chaine,(yyval.typestruct).chaine);
             }else if(valLog == 1){
-                  (yyval.entier) = (yyvsp[(1) - (3)].entier) || (yyvsp[(3) - (3)].entier) ;
+                  (yyval.typestruct).valeur = (yyvsp[(1) - (3)].typestruct).valeur || (yyvsp[(3) - (3)].typestruct).valeur ;
+                  
+                    if((yyval.typestruct).valeur == 0)  (yyval.typestruct).chaine=strdup("FALSE");
+                    else (yyval.typestruct).chaine=strdup("TRUE"); 
+                   quadr("OR",(yyvsp[(1) - (3)].typestruct).chaine,(yyvsp[(3) - (3)].typestruct).chaine,(yyval.typestruct).chaine);
            }
+                   
             ;}
     break;
 
   case 65:
 
 /* Line 1455 of yacc.c  */
-#line 263 "syntaxique.y"
+#line 315 "syntaxique.y"
     {
+                    
             if(valLog == 0){
-                  (yyval.entier) = (yyvsp[(1) - (3)].entier) && (yyvsp[(3) - (3)].entier);
+                  (yyval.typestruct).valeur = (yyvsp[(1) - (3)].typestruct).valeur && (yyvsp[(3) - (3)].typestruct).valeur;
+                   
+                    if((yyval.typestruct).valeur == 0)  (yyval.typestruct).chaine=strdup("FALSE");
+                    else (yyval.typestruct).chaine=strdup("TRUE"); 
+                   quadr("AND",(yyvsp[(1) - (3)].typestruct).chaine,(yyvsp[(3) - (3)].typestruct).chaine,(yyval.typestruct).chaine);
             }else if(valLog == 1){
-                  (yyval.entier) = (yyvsp[(1) - (3)].entier) || (yyvsp[(3) - (3)].entier) ;
+                  (yyval.typestruct).valeur = (yyvsp[(1) - (3)].typestruct).valeur || (yyvsp[(3) - (3)].typestruct).valeur ;
+                     if((yyval.typestruct).valeur == 0)  (yyval.typestruct).chaine=strdup("FALSE");
+                    else (yyval.typestruct).chaine=strdup("TRUE"); 
+                   quadr("OR",(yyvsp[(1) - (3)].typestruct).chaine,(yyvsp[(3) - (3)].typestruct).chaine,(yyval.typestruct).chaine);
            }
             ;}
     break;
@@ -2168,82 +2228,111 @@ yyreduce:
   case 66:
 
 /* Line 1455 of yacc.c  */
-#line 272 "syntaxique.y"
+#line 332 "syntaxique.y"
     {
-          (yyval.entier) = (yyvsp[(1) - (1)].entier); 
+          (yyval.typestruct).valeur = (yyvsp[(1) - (1)].entier); //1 true 0 false
+          
+           if((yyvsp[(1) - (1)].entier) == 0)  (yyval.typestruct).chaine=strdup("FALSE");
+           else (yyval.typestruct).chaine=strdup("TRUE"); 
          ;}
     break;
 
   case 67:
 
 /* Line 1455 of yacc.c  */
-#line 275 "syntaxique.y"
+#line 338 "syntaxique.y"
     { 
-          (yyval.entier) = (yyvsp[(1) - (1)].entier);
+           (yyval.typestruct).valeur = (yyvsp[(1) - (1)].entier); //1 true 0 false
+            
+           if((yyvsp[(1) - (1)].entier) == 0)  (yyval.typestruct).chaine=strdup("FALSE");
+           else (yyval.typestruct).chaine=strdup("TRUE"); 
          ;}
     break;
 
   case 68:
 
 /* Line 1455 of yacc.c  */
-#line 278 "syntaxique.y"
+#line 344 "syntaxique.y"
     {
-            if(strcmp((yyvsp[(1) - (1)].string),"FALSE")==0) (yyval.entier) = 0; //false
-            else if(strcmp((yyvsp[(1) - (1)].string),"TRUE")==0) (yyval.entier) = 1; //true
+
+
+            if(strcmp((yyvsp[(1) - (1)].string),"FALSE")==0){
+               (yyval.typestruct).valeur = 0; 
+               (yyval.typestruct).chaine = strdup("FALSE");
+               }//false
+            else if(strcmp((yyvsp[(1) - (1)].string),"TRUE")==0){
+               (yyval.typestruct).valeur = 1;
+               (yyval.typestruct).chaine = strdup("TRUE");
+               } //true
          ;}
     break;
 
   case 69:
 
 /* Line 1455 of yacc.c  */
-#line 282 "syntaxique.y"
+#line 356 "syntaxique.y"
     { 
-            
-            if(ValueIdfBol((yyvsp[(1) - (1)].string))==1) (yyval.entier) = 0; //false
-            else if(ValueIdfBol((yyvsp[(1) - (1)].string))==0) (yyval.entier) = 1; //true    
+            if(Declared((yyvsp[(1) - (1)].string))==1 && HasValue((yyvsp[(1) - (1)].string),-1)==1){
+               
+                (yyval.typestruct).valeur = ValueIdfBol((yyvsp[(1) - (1)].string));
+                 (yyval.typestruct).chaine = strdup((yyvsp[(1) - (1)].string)); 
+            }  
          ;}
     break;
 
   case 70:
 
 /* Line 1455 of yacc.c  */
-#line 288 "syntaxique.y"
+#line 364 "syntaxique.y"
     {
            
-          
-            if(ValueTabBol((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].entier))==1) (yyval.entier) = 0; //false
-            else if(ValueTabBol((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].entier))==0) (yyval.entier) = 1; //true 
-            
+          if(Declared((yyvsp[(1) - (4)].string))==1 && HasValue((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].entier))==1){ 
+                      char str[100] ;
+                       char str2[100];
+                       str[0] = '\0'; 
+                       strcat(str,(yyvsp[(1) - (4)].string));
+                       strcat(str,"[");
+                       sprintf(str2,"%d",(yyvsp[(3) - (4)].entier));
+                       strcat(str,str2);
+                       strcat(str,"]");  
+                       (yyval.typestruct).chaine=str;
+                       (yyval.typestruct).valeur = ValueTabBol((yyvsp[(1) - (4)].string),(yyvsp[(3) - (4)].entier));
+            }
          ;}
     break;
 
   case 71:
 
 /* Line 1455 of yacc.c  */
-#line 297 "syntaxique.y"
+#line 381 "syntaxique.y"
     {
    
-  sprintf(val1,"%f",(float)(yyvsp[(3) - (6)].reel));
-  sprintf(val2,"%f",(float)(yyvsp[(5) - (6)].reel));
+  // sprintf(val1,"%f",(float)$3);
+  // sprintf(val2,"%f",(float)$5);
   sprintf(valSigne,"%d",(yyvsp[(1) - (6)].entier));
-  resComp=resultatComparaison(val1,val2,valSigne);
-  //printf("Resultat: %d \n",resComp);
-  if(resComp == 0){
+  
+    char ch1[100], ch2[100];
+    sprintf(ch1,"%f",(yyvsp[(3) - (6)].typestruct).valeur);
+    sprintf(ch2,"%f",(yyvsp[(5) - (6)].typestruct).valeur);
+    resComp=resultatComparaison(ch1,ch2,valSigne);
+  //  printf("-----------------------------chaines : %s , %s \n",$3.chaine,$5.chaine);
+  //   printf("----------------------------valeurs : %f , %f \n",$3.valeur,$5.valeur);
+  // printf("-------------------------- %d Resultat: %d \n",$1,resComp);
+  if(resComp == 1){
     (yyval.entier)=1; //TRUE
-  }else if(resComp ==1 ){
+  }else
     (yyval.entier)=0; //FALSE
-  }
 
   char str[100];
-  if(resComp == 0 ) strcpy(str,"TRUE");
+  if(resComp == 1 ) strcpy(str,"TRUE");
   else strcpy(str,"FALSE");
 
-  if((yyvsp[(1) - (6)].entier) == 0) quadr("SUP",str,"vide","vide");
-  else if((yyvsp[(1) - (6)].entier) == 1) quadr("SUPEG",str,"vide","vide");
-  else if((yyvsp[(1) - (6)].entier) == 2) quadr("INFEG",str,"vide","vide");
-  else if((yyvsp[(1) - (6)].entier) == 3) quadr("INF",str,"vide","vide");
-  else if((yyvsp[(1) - (6)].entier) == 4) quadr("EGA",str,"vide","vide");
-  else if((yyvsp[(1) - (6)].entier) == 5) quadr("DIF",str,"vide","vide");
+  if((yyvsp[(1) - (6)].entier) == 0) quadr("SUP",(yyvsp[(3) - (6)].typestruct).chaine,(yyvsp[(5) - (6)].typestruct).chaine,str);
+  else if((yyvsp[(1) - (6)].entier) == 1) quadr("SUPEG",(yyvsp[(3) - (6)].typestruct).chaine,(yyvsp[(5) - (6)].typestruct).chaine,str);
+  else if((yyvsp[(1) - (6)].entier) == 2) quadr("INFEG",(yyvsp[(3) - (6)].typestruct).chaine,(yyvsp[(5) - (6)].typestruct).chaine,str);
+  else if((yyvsp[(1) - (6)].entier) == 3) quadr("INF",(yyvsp[(3) - (6)].typestruct).chaine,(yyvsp[(5) - (6)].typestruct).chaine,str);
+  else if((yyvsp[(1) - (6)].entier) == 4) quadr("EGA",(yyvsp[(3) - (6)].typestruct).chaine,(yyvsp[(5) - (6)].typestruct).chaine,str);
+  else if((yyvsp[(1) - (6)].entier) == 5) quadr("DIF",(yyvsp[(3) - (6)].typestruct).chaine,(yyvsp[(5) - (6)].typestruct).chaine,str);
 
 
 
@@ -2253,49 +2342,49 @@ yyreduce:
   case 72:
 
 /* Line 1455 of yacc.c  */
-#line 325 "syntaxique.y"
+#line 414 "syntaxique.y"
     { (yyval.entier)=0; ;}
     break;
 
   case 73:
 
 /* Line 1455 of yacc.c  */
-#line 326 "syntaxique.y"
+#line 415 "syntaxique.y"
     { (yyval.entier)=1 ;;}
     break;
 
   case 74:
 
 /* Line 1455 of yacc.c  */
-#line 327 "syntaxique.y"
+#line 416 "syntaxique.y"
     { (yyval.entier)=2 ;;}
     break;
 
   case 75:
 
 /* Line 1455 of yacc.c  */
-#line 328 "syntaxique.y"
+#line 417 "syntaxique.y"
     { (yyval.entier)=3 ;;}
     break;
 
   case 76:
 
 /* Line 1455 of yacc.c  */
-#line 329 "syntaxique.y"
+#line 418 "syntaxique.y"
     { (yyval.entier)=4 ;;}
     break;
 
   case 77:
 
 /* Line 1455 of yacc.c  */
-#line 330 "syntaxique.y"
+#line 419 "syntaxique.y"
     { (yyval.entier)=5 ;}
     break;
 
   case 78:
 
 /* Line 1455 of yacc.c  */
-#line 335 "syntaxique.y"
+#line 424 "syntaxique.y"
     {
   fonctionInput((yyvsp[(4) - (7)].string),(yyvsp[(6) - (7)].entier));
   quadr("INPUT","vide","vide",(yyvsp[(4) - (7)].string));
@@ -2305,7 +2394,7 @@ yyreduce:
   case 79:
 
 /* Line 1455 of yacc.c  */
-#line 344 "syntaxique.y"
+#line 433 "syntaxique.y"
     { 
         VerificationTypeINOUT((yyvsp[(4) - (6)].string),(yyvsp[(2) - (6)].entier)); 
         char str[100]; 
@@ -2346,7 +2435,7 @@ yyreduce:
   case 80:
 
 /* Line 1455 of yacc.c  */
-#line 379 "syntaxique.y"
+#line 468 "syntaxique.y"
     {
         deb = 2; 
         char str[100]; 
@@ -2362,7 +2451,7 @@ yyreduce:
   case 81:
 
 /* Line 1455 of yacc.c  */
-#line 389 "syntaxique.y"
+#line 478 "syntaxique.y"
     {
         deb = 3;
          VerificationTypeINOUT((yyvsp[(4) - (5)].string),(yyvsp[(2) - (5)].entier)); 
@@ -2396,7 +2485,7 @@ yyreduce:
   case 82:
 
 /* Line 1455 of yacc.c  */
-#line 417 "syntaxique.y"
+#line 506 "syntaxique.y"
     {
         deb = 4; 
         char str[100]; 
@@ -2414,56 +2503,56 @@ yyreduce:
   case 83:
 
 /* Line 1455 of yacc.c  */
-#line 431 "syntaxique.y"
+#line 520 "syntaxique.y"
     { (yyval.string) = (yyvsp[(1) - (1)].string); tab = 0; ;}
     break;
 
   case 84:
 
 /* Line 1455 of yacc.c  */
-#line 432 "syntaxique.y"
+#line 521 "syntaxique.y"
     { (yyval.string) = (yyvsp[(1) - (4)].string); tab = 1; pos = (yyvsp[(3) - (4)].entier); ;}
     break;
 
   case 85:
 
 /* Line 1455 of yacc.c  */
-#line 435 "syntaxique.y"
+#line 524 "syntaxique.y"
     { (yyval.entier) = 1;;}
     break;
 
   case 86:
 
 /* Line 1455 of yacc.c  */
-#line 436 "syntaxique.y"
+#line 525 "syntaxique.y"
     { (yyval.entier) = 2;;}
     break;
 
   case 87:
 
 /* Line 1455 of yacc.c  */
-#line 437 "syntaxique.y"
+#line 526 "syntaxique.y"
     { (yyval.entier) = 3;;}
     break;
 
   case 88:
 
 /* Line 1455 of yacc.c  */
-#line 438 "syntaxique.y"
+#line 527 "syntaxique.y"
     { (yyval.entier) = 4;;}
     break;
 
   case 89:
 
 /* Line 1455 of yacc.c  */
-#line 439 "syntaxique.y"
+#line 528 "syntaxique.y"
     { (yyval.entier) = 5;;}
     break;
 
   case 92:
 
 /* Line 1455 of yacc.c  */
-#line 444 "syntaxique.y"
+#line 533 "syntaxique.y"
     {  
               InverserChaine(buffer);  
               printf("%s\n",buffer);
@@ -2475,7 +2564,7 @@ yyreduce:
   case 95:
 
 /* Line 1455 of yacc.c  */
-#line 460 "syntaxique.y"
+#line 549 "syntaxique.y"
     {
 
                deb_else = qc;
@@ -2488,7 +2577,7 @@ yyreduce:
   case 96:
 
 /* Line 1455 of yacc.c  */
-#line 469 "syntaxique.y"
+#line 558 "syntaxique.y"
     {
       Fin_if=qc;
       quadr("BR","","vide","vide"); 
@@ -2500,7 +2589,7 @@ yyreduce:
   case 97:
 
 /* Line 1455 of yacc.c  */
-#line 477 "syntaxique.y"
+#line 566 "syntaxique.y"
     {
 
     ;}
@@ -2509,7 +2598,7 @@ yyreduce:
   case 99:
 
 /* Line 1455 of yacc.c  */
-#line 482 "syntaxique.y"
+#line 571 "syntaxique.y"
     { 
 
       sprintf(tmp,"%d",qc);
@@ -2522,7 +2611,7 @@ yyreduce:
   case 100:
 
 /* Line 1455 of yacc.c  */
-#line 491 "syntaxique.y"
+#line 580 "syntaxique.y"
     { 
               (yyval.entier) = (yyvsp[(1) - (1)].entier); 
               
@@ -2532,7 +2621,7 @@ yyreduce:
   case 101:
 
 /* Line 1455 of yacc.c  */
-#line 495 "syntaxique.y"
+#line 584 "syntaxique.y"
     { 
               (yyval.entier) = (yyvsp[(1) - (1)].entier);
          ;}
@@ -2541,7 +2630,7 @@ yyreduce:
   case 105:
 
 /* Line 1455 of yacc.c  */
-#line 505 "syntaxique.y"
+#line 594 "syntaxique.y"
     {  
                     InverserChaine(buffer);  
                     printf("%s\n",buffer);
@@ -2553,7 +2642,7 @@ yyreduce:
   case 109:
 
 /* Line 1455 of yacc.c  */
-#line 520 "syntaxique.y"
+#line 609 "syntaxique.y"
     { //R1
     
     DebCondDo=qc;
@@ -2567,7 +2656,7 @@ yyreduce:
   case 110:
 
 /* Line 1455 of yacc.c  */
-#line 529 "syntaxique.y"
+#line 618 "syntaxique.y"
     {
   sprintf(tmp,"%d",qc);
   ajour_quad(DebCondDo,1,tmp);
@@ -2577,7 +2666,7 @@ yyreduce:
   case 111:
 
 /* Line 1455 of yacc.c  */
-#line 535 "syntaxique.y"
+#line 624 "syntaxique.y"
     { //R3
     sprintf(tmp,"%d",DebInstDo);
      quadr("BNZ",tmp,"tempInst","vide");
@@ -2588,7 +2677,7 @@ yyreduce:
   case 112:
 
 /* Line 1455 of yacc.c  */
-#line 542 "syntaxique.y"
+#line 631 "syntaxique.y"
     {
   
       printf("pgm correct\n"); 
@@ -2598,7 +2687,7 @@ yyreduce:
   case 115:
 
 /* Line 1455 of yacc.c  */
-#line 551 "syntaxique.y"
+#line 640 "syntaxique.y"
     {  
                       
                     printf("%s\n",buffer);
@@ -2611,7 +2700,7 @@ yyreduce:
   case 121:
 
 /* Line 1455 of yacc.c  */
-#line 567 "syntaxique.y"
+#line 656 "syntaxique.y"
     { //R1
   Declared((yyvsp[(3) - (5)].string));
   if(typeEntite((yyvsp[(3) - (5)].string))!=0) {
@@ -2626,7 +2715,7 @@ yyreduce:
   case 122:
 
 /* Line 1455 of yacc.c  */
-#line 577 "syntaxique.y"
+#line 666 "syntaxique.y"
     {//R2
   Fin_For = qc;  
   quadr("BZ","","vide","vide");
@@ -2638,7 +2727,7 @@ yyreduce:
   case 123:
 
 /* Line 1455 of yacc.c  */
-#line 585 "syntaxique.y"
+#line 674 "syntaxique.y"
     {
   //R3
  
@@ -2654,26 +2743,26 @@ yyreduce:
   case 124:
 
 /* Line 1455 of yacc.c  */
-#line 596 "syntaxique.y"
+#line 685 "syntaxique.y"
     { 
  
     if(verificationConditionFor((yyvsp[(1) - (1)].string)) == 1) {   
       (yyval.entier) = getValIdfInt((yyvsp[(1) - (1)].string));
     }
-   ;}
+;}
     break;
 
   case 125:
 
 /* Line 1455 of yacc.c  */
-#line 602 "syntaxique.y"
+#line 691 "syntaxique.y"
     { (yyval.entier) = (yyvsp[(1) - (1)].entier); ;}
     break;
 
   case 128:
 
 /* Line 1455 of yacc.c  */
-#line 607 "syntaxique.y"
+#line 696 "syntaxique.y"
     {
                    InverserChaine(buffer);  
                     printf("%s\n",buffer);
@@ -2686,7 +2775,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 2690 "syntaxique.tab.c"
+#line 2779 "syntaxique.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2898,7 +2987,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 620 "syntaxique.y"
+#line 709 "syntaxique.y"
 
 int main(int argc,char* argv[])
 {   

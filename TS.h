@@ -196,27 +196,31 @@ int categDeclaredAs(char entite[],char categ[]){
 }
 
 
-float getValueTab(char idf[],int position){
+float getValueTab(char idf[],int position,char * res){
     element *p;
     int cle;
     char **temporary;
-    float val;
+    float val=0;
     cle = fonction_hachage(idf);
     for(p=table_hachage[cle];p!=NULL;p=p->suivant)
-      if(strcmp(p->name,idf)==0 && (strcmp(p->type,"INT")==0 || strcmp(p->type,"FLT")==0))
+      if(strcmp(p->name,idf)==0 && ((strcmp(p->type,"INT")==0 || strcmp(p->type,"FLT")==0)))
       {
         temporary= (char**) malloc((p->taille)*sizeof(char*));
         memcpy(temporary, p->arrayTab,p->taille);
         val = atof(temporary[position]);
+        
+          memset(temporary, 0, p->taille);
+          memcpy(temporary, p->arrayTab,p->taille); 
+          sprintf(res,"%f",val);
         return val;
 
-      }else if((strcmp(p->type,"INT")!=0 && strcmp(p->type,"FLT")!=0))
+      }else if(strcmp(p->name,idf)==0)
             {
               printf("Erreur semantique: une expression arithmetique contient un idf Tableau %s de type STRING\n",idf);
               exit(0);
             }
 
-
+ return val;
   
 }
 
@@ -249,8 +253,6 @@ int getValueIdf(char idf[], char* res){
   
       }
     } 
-    printf("Erreur semantique: Affectation d'une expression arithmetique avec un idf %s sans valeur \n",idf);
-    exit(0);
     
 }
 
@@ -269,12 +271,11 @@ int getValIdfInt(char entite[]){
     }
 
 
-}
-
+} 
 int verificationConditionFor(char entite[]){
 
 
-  if(Declared(entite)==1 && typeEntite(entite)==0 && HasValue(entite)==1 )
+  if(Declared(entite)==1 && typeEntite(entite)==0 && HasValue(entite,-1)==1 )
   {
     return 1;
   }else {
@@ -287,15 +288,24 @@ int verificationConditionFor(char entite[]){
   return 0; 
 }
 
-int HasValue(char entite[]){
+int HasValue(char entite[], int isItTab){
   
     element *p;
     int cle;  
+    char **temporary;
     cle = fonction_hachage(entite);
     for(p=table_hachage[cle];p!=NULL;p=p->suivant){
-      if(strcmp(p->name,entite)==0 && (p->state!=3) )
+      if(strcmp(p->name,entite)==0 )
       {
-        return 1;
+        if(isItTab == -1 && (p->state!=3)) return 1;
+        else if(isItTab != -1){
+           printf("IT S A TABLE\n");
+           temporary= (char**) malloc((p->taille)*sizeof(char*));
+           memcpy(temporary, p->arrayTab,p->taille);
+           if(temporary[isItTab]!=NULL){
+             return 1;
+           }
+        }
       }
     }
     
@@ -456,21 +466,22 @@ verificationAffectation(char entite[],int type,char valeur[]){
 
 int resultatComparaison(char val1[] ,char val2[], char signe []){
   
+      printf("valeurs : %f , %f \n",atof(val1),atof(val2));
 
   int typ = atoi(signe);
 
   switch(typ){
    
-      case 0: {if(atof(val1)>atof(val2)) return 0;} break;
-      case 1:{if(atof(val1)>=atof(val2)) return 0;}   break;
-      case 2:{if(atof(val1)<=atof(val2)) return 0;} break;
-      case 3:{if(atof(val1)<atof(val2)) return 0;} break;
-      case 4:{if(atof(val1)==atof(val2)) return 0;} break;
-      case 5:{if(atof(val1)!=atof(val2)) return 0;} break;
-      default: printf("Val1 = %f , Val2 = %f , signe = %d \n",val1,val2,signe); break;
+      case 0:{if(atof(val1) > atof(val2) )  return 1;} break;
+      case 1:{if(atof(val1) >= atof(val2)) return 1;}   break;
+      case 2:{if(atof(val1)<=atof(val2)) return 1;} break;
+      case 3:{if(atof(val1)<atof(val2)) return 1;} break;
+      case 4:{if(atof(val1)==atof(val2))  return 1;} break;
+      case 5:{if(atof(val1)!=atof(val2)) return 1;} break;
+      default: printf("Val1 = %s , Val2 = %s , signe = %d \n",val1,val2,signe); break;
   }
 
-  return 1;//false 
+  return 0;//false 
 }
  
 int ValueTabBol(char entite[],int position){
@@ -488,8 +499,8 @@ int ValueTabBol(char entite[],int position){
 
             temporary= (char**) malloc((p->taille)*sizeof(char*));
             memcpy(temporary, p->arrayTab,p->taille);
-            if(strcmp(temporary[position],"TRUE")==0) return 0;//true
-            else if(strcmp(temporary[position],"FALSE")==0) return 1;//false
+            if(strcmp(temporary[position],"TRUE")==0) return 1;//true
+            else if(strcmp(temporary[position],"FALSE")==0) return 0;//false
 
           }
       }
@@ -510,8 +521,8 @@ int ValueIdfBol(char entite[]){
         if(strcmp(p->name,entite)==0 && strcmp(p->categorie,"variable")==0)
           { 
             
-            if(strcmp(p->valStr,"TRUE")==0) return 0;//true
-            else if(strcmp(p->valStr,"FALSE")==0) return 1;//false
+            if(strcmp(p->valStr,"TRUE")==0) return 1;//true
+            else if(strcmp(p->valStr,"FALSE")==0) return 0;//false
 
           }
       }

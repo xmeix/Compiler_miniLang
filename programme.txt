@@ -26,7 +26,7 @@
         </ARRAY> 
     </ SUB VARIABLE >
     <SUB CONSTANTE> 
-        <x = 10 />; 
+        <x = TRUE />; 
         <nom_constante_5 = "hello" />;
         <b = (-150.11) />;
         <nom_constante_11 = (+32767) />;
@@ -36,42 +36,16 @@
         <nom_constante_6 = 7.3 />;
         <const = FALSE />;
          <idf = "string" />;
-         <nom_constante_2 = 100.01/>;    
+         <nom_constante_2 = 100.1/>;    
     </SUB CONSTANTE>
     <body> 
         
-         <FOR i=3 UNTIL x>
-             <AFF: a, 8 + 990 - 9 * 10 />
+         
 
-
-        <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
-    <DO>
-           
-            <OUTPUT: " a = b " />
-            <AFF: T, 8 + 9 />
-            <IF: AND(EGA(a,3),SUP(7,b)) >
-                            <THEN>
-                                    <OUTPUT: " a = b " /> 
-                                    <INPUT: idf  " #" />
-            <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
-                            
-                            </THEN>
-                            <ELSE>
-                                    <OUTPUT: "condition non verifiee" />
-                                    <OUTPUT: " a = b " />
-                                    <AFF:idf2, 8 + 9/>
-                                    <INPUT: idf  " #" />
-            <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
-                            </ELSE> 
-                    </IF>
-            <INPUT: idf  " #" />
-            <OUTPUT: "hdsf # kndcs "+ idf + " kjsdfksd " + " jkfskjfn "+ " fsnf # "+idf />
-                            
-    <WHILE :AND(EGA(x,3),SUP(7,b))/>
-    </DO>
-         </FOR>
-
-
+       <DO>
+    
+       <WHILE :AND(x,SUP(7,b))/>
+       </DO>
     </body>
 
 
